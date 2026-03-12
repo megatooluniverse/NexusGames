@@ -104,11 +104,12 @@
         .memory-card.matched { opacity: 0.2; pointer-events: none; transform: scale(0.9); border-color: transparent; }
 
         /* SNAKE SPECIFIC CSS */
-        #snake-canvas { background: rgba(0,0,0,0.5); border: 2px solid var(--glass-border); border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.5); max-width: 100%; touch-action: none;}
+        #snake-canvas { background: rgba(0,0,0,0.5); border: 2px solid var(--glass-border); border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.5); max-width: 100%; touch-action: none; /* Prevents scrolling while swiping */ cursor: crosshair;}
         .snake-controls { display: grid; grid-template-columns: 60px 60px 60px; grid-template-rows: 60px 60px; gap: 10px; margin-top: 15px; justify-content: center; }
         .d-btn { background: var(--bg-panel); border: var(--glass-border); color: white; border-radius: 12px; font-size: 24px; display: flex; justify-content: center; align-items: center; cursor: pointer; touch-action: manipulation; }
         .d-btn:active { background: var(--primary); transform: scale(0.9); }
         .d-up { grid-column: 2; grid-row: 1; } .d-left { grid-column: 1; grid-row: 2; } .d-down { grid-column: 2; grid-row: 2; } .d-right { grid-column: 3; grid-row: 2; }
+        .swipe-hint { color: var(--accent); font-size: 12px; margin-top: 10px; text-align: center; }
 
         .chat-box { height: clamp(150px, 20vh, 200px); background: var(--bg-panel); border-radius: var(--radius); display: flex; flex-direction: column; overflow: hidden; border: var(--glass-border); width: 100%; }
         .chat-messages { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; scroll-behavior: smooth; }
@@ -180,7 +181,7 @@
         <div class="card" id="create-form">
             <h3 style="text-align: left; color: var(--text-muted); font-size: 14px;">Choose Mode:</h3>
             <select id="game-select">
-                <option value="snake">Snake Battle 🐍 (NEW)</option>
+                <option value="snake">Snake Battle 🐍 (Swipe Support!)</option>
                 <option value="ttt">Tic Tac Toe ❌⭕</option>
                 <option value="rps">Rock Paper Scissors 🪨📄✂️</option>
                 <option value="memory">Memory Card Match 🧠</option>
@@ -368,16 +369,17 @@
 
     /* 8. GAME ENGINES */
     const GameEngines = {
-        /* =============== NEW: SNAKE BATTLE ENGINE =============== */
+        /* =============== SNAKE BATTLE ENGINE (With Swipe & D-Pad) =============== */
         snake: {
-            loop: null, ctx: null, canvas: null, gridSize: 15, tileCount: 20,
+            loop: null, ctx: null, canvas: null, gridSize: 15, tileCount: 20, touchStartX: 0, touchStartY: 0,
             state: { p1: {x: 5, y: 10, dx: 1, dy: 0, tail: [], color: '#3b82f6'}, p2: {x: 14, y: 10, dx: -1, dy: 0, tail: [], color: '#ef4444'}, food: {x: 10, y: 5} },
             initialize: () => {
                 sys.isBoardLocked = false;
-                document.getElementById('chat-section').style.display = 'none'; // Hide chat for mobile space
+                document.getElementById('chat-section').style.display = 'none'; // Hide chat for snake
                 document.getElementById('board-container').innerHTML = `
                     <div style="text-align:center;">
                         <canvas id="snake-canvas" width="300" height="300"></canvas>
+                        <p class="swipe-hint">💡 Tip: Swipe directly on the game board!</p>
                         <div class="snake-controls">
                             <div class="d-btn d-up" onclick="GameEngines.snake.sendDir(0, -1)">⬆️</div>
                             <div class="d-btn d-left" onclick="GameEngines.snake.sendDir(-1, 0)">⬅️</div>
@@ -386,6 +388,7 @@
                         </div>
                     </div>`;
                 updateTurnText(null, "Eat apples! Don't crash!");
+                
                 GameEngines.snake.canvas = document.getElementById('snake-canvas');
                 GameEngines.snake.ctx = GameEngines.snake.canvas.getContext('2d');
                 GameEngines.snake.state = { p1: {x: 5, y: 10, dx: 1, dy: 0, tail: [], color: '#3b82f6'}, p2: {x: 14, y: 10, dx: -1, dy: 0, tail: [], color: '#ef4444'}, food: {x: 10, y: 5} };
@@ -393,9 +396,44 @@
                 // Keyboard Support
                 document.addEventListener('keydown', GameEngines.snake.handleKey);
                 
+                // Swipe Support (NEW)
+                GameEngines.snake.canvas.addEventListener('touchstart', GameEngines.snake.handleTouchStart, {passive: false});
+                GameEngines.snake.canvas.addEventListener('touchmove', GameEngines.snake.handleTouchMove, {passive: false});
+                
                 if (sys.isHost) {
                     GameEngines.snake.placeFood();
-                    GameEngines.snake.loop = setInterval(GameEngines.snake.gameTick, 200); // Host drives the game
+                    GameEngines.snake.loop = setInterval(GameEngines.snake.gameTick, 200); 
+                }
+            },
+            handleTouchStart: (e) => {
+                if(sys.isBoardLocked) return;
+                e.preventDefault(); // Prevents screen dragging
+                GameEngines.snake.touchStartX = e.touches[0].clientX;
+                GameEngines.snake.touchStartY = e.touches[0].clientY;
+            },
+            handleTouchMove: (e) => {
+                if(sys.isBoardLocked || !GameEngines.snake.touchStartX || !GameEngines.snake.touchStartY) return;
+                e.preventDefault(); // Prevents screen dragging
+                
+                let touchEndX = e.touches[0].clientX;
+                let touchEndY = e.touches[0].clientY;
+                
+                let dx = touchEndX - GameEngines.snake.touchStartX;
+                let dy = touchEndY - GameEngines.snake.touchStartY;
+                
+                // Minimum swipe distance threshold (30px) so accidental touches don't trigger it
+                if (Math.abs(dx) > 30 || Math.abs(dy) > 30) {
+                    if (Math.abs(dx) > Math.abs(dy)) {
+                        // Horizontal swipe
+                        if (dx > 0) GameEngines.snake.sendDir(1, 0); // Right
+                        else GameEngines.snake.sendDir(-1, 0); // Left
+                    } else {
+                        // Vertical swipe
+                        if (dy > 0) GameEngines.snake.sendDir(0, 1); // Down
+                        else GameEngines.snake.sendDir(0, -1); // Up
+                    }
+                    // Reset start points so it doesn't fire continuously
+                    GameEngines.snake.touchStartX = 0; GameEngines.snake.touchStartY = 0; 
                 }
             },
             sendDir: (dx, dy) => {
@@ -417,10 +455,8 @@
             },
             handleNetworkData: (data) => {
                 if (data.type === 'snake_dir' && sys.isHost) {
-                    // Host receives guest input
                     GameEngines.snake.state.p2.dx = data.dx; GameEngines.snake.state.p2.dy = data.dy;
                 } else if (data.type === 'snake_state' && !sys.isHost) {
-                    // Guest receives master state from Host
                     GameEngines.snake.state = data.state;
                     GameEngines.snake.drawBoard();
                 } else if (data.type === 'snake_gameover') {
@@ -431,20 +467,17 @@
             gameTick: () => {
                 if(sys.isBoardLocked) return;
                 let s = GameEngines.snake.state;
+                
                 // Move Snakes
-                [s.p1, s.p2].forEach(p => {
-                    p.tail.push({x: p.x, y: p.y});
-                    p.x += p.dx; p.y += p.dy;
-                });
+                [s.p1, s.p2].forEach(p => { p.tail.push({x: p.x, y: p.y}); p.x += p.dx; p.y += p.dy; });
                 
                 // Check Food
                 [s.p1, s.p2].forEach(p => {
-                    if (p.x === s.food.x && p.y === s.food.y) {
-                        playSound('click'); GameEngines.snake.placeFood();
-                    } else { p.tail.shift(); }
+                    if (p.x === s.food.x && p.y === s.food.y) { playSound('click'); GameEngines.snake.placeFood(); } 
+                    else { p.tail.shift(); }
                 });
 
-                // Check Collisions (Host side only)
+                // Check Collisions
                 let p1Crash = GameEngines.snake.checkCrash(s.p1, s.p2);
                 let p2Crash = GameEngines.snake.checkCrash(s.p2, s.p1);
                 
@@ -458,8 +491,7 @@
 
                 if (winner) {
                     sys.isBoardLocked = true; clearInterval(GameEngines.snake.loop); document.removeEventListener('keydown', GameEngines.snake.handleKey); document.getElementById('chat-section').style.display = 'flex';
-                    dataChannel.send({ type: 'snake_gameover', winner: winner });
-                    finalizeGame(winner);
+                    dataChannel.send({ type: 'snake_gameover', winner: winner }); finalizeGame(winner);
                 }
             },
             checkCrash: (p, opp) => {
@@ -480,7 +512,7 @@
             }
         },
 
-        /* =============== EXISTING GAMES SECURELY RETAINED =============== */
+        /* =============== OTHER GAMES =============== */
         ttt: {
             initialize: () => { gameState = { board: Array(9).fill(null), currentTurn: 'p1' }; GameEngines.ttt.renderBoard(); },
             renderBoard: () => { let html = `<div class="ttt-grid">`; for (let i = 0; i < 9; i++) { let cellValue = ''; if (gameState.board[i] === 'p1') cellValue = '❌'; if (gameState.board[i] === 'p2') cellValue = '⭕'; html += `<div class="ttt-cell" onclick="GameEngines.ttt.makeMove(${i})" id="cell-${i}">${cellValue}</div>`; } document.getElementById('board-container').innerHTML = html + `</div>`; updateTurnText(gameState.currentTurn); },
