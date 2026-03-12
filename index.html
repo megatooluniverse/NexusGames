@@ -10,172 +10,123 @@
            1. CSS VARIABLES & THEMES
         ========================================= */
         :root {
-            --bg-dark: #0f172a; 
-            --bg-panel: rgba(30, 41, 59, 0.8); 
-            --primary: #3b82f6; 
-            --primary-glow: rgba(59, 130, 246, 0.6); 
-            --accent: #10b981; 
-            --danger: #ef4444; 
-            --warning: #f59e0b;
-            --text-light: #f8fafc; 
-            --text-muted: #94a3b8;
-            --radius: 16px; 
-            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+            --bg-dark: #0f172a; --bg-panel: rgba(30, 41, 59, 0.8); 
+            --primary: #3b82f6; --primary-glow: rgba(59, 130, 246, 0.6); 
+            --accent: #10b981; --danger: #ef4444; --warning: #f59e0b;
+            --text-light: #f8fafc; --text-muted: #94a3b8;
+            --radius: 16px; --glass-border: 1px solid rgba(255, 255, 255, 0.1);
         }
-
         .light-mode {
-            --bg-dark: #f1f5f9; 
-            --bg-panel: rgba(255, 255, 255, 0.9);
-            --text-light: #0f172a; 
-            --text-muted: #475569;
-            --glass-border: 1px solid rgba(0, 0, 0, 0.1);
-            --primary-glow: rgba(59, 130, 246, 0.3);
+            --bg-dark: #f1f5f9; --bg-panel: rgba(255, 255, 255, 0.9);
+            --text-light: #0f172a; --text-muted: #475569;
+            --glass-border: 1px solid rgba(0, 0, 0, 0.1); --primary-glow: rgba(59, 130, 246, 0.3);
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
-        
-        body { 
-            background-color: var(--bg-dark); 
-            color: var(--text-light); 
-            overflow-x: hidden; 
-            min-height: 100vh; 
-            position: relative;
-            transition: background-color 0.4s ease, color 0.4s ease;
-        }
+        body { background-color: var(--bg-dark); color: var(--text-light); overflow-x: hidden; min-height: 100vh; position: relative; transition: background-color 0.4s ease, color 0.4s ease; -webkit-tap-highlight-color: transparent; }
 
         /* =========================================
            2. ANIMATED BACKGROUND
         ========================================= */
-        .bg-orb { 
-            position: absolute; 
-            border-radius: 50%; 
-            filter: blur(90px); 
-            z-index: -1; 
-            animation: floatOrb 12s infinite alternate ease-in-out; 
-        }
-        .orb-1 { top: -10%; left: -10%; width: 400px; height: 400px; background: rgba(59, 130, 246, 0.25); }
-        .orb-2 { bottom: -10%; right: -10%; width: 500px; height: 500px; background: rgba(16, 185, 129, 0.2); }
-        
-        @keyframes floatOrb { 
-            0% { transform: translate(0,0) scale(1); } 
-            100% { transform: translate(100px, 100px) scale(1.1); } 
-        }
+        .bg-orb { position: fixed; border-radius: 50%; filter: blur(90px); z-index: -1; will-change: transform; animation: floatOrb 12s infinite alternate ease-in-out; pointer-events: none; }
+        .orb-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; min-width: 300px; min-height: 300px; background: rgba(59, 130, 246, 0.25); }
+        .orb-2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; min-width: 400px; min-height: 400px; background: rgba(16, 185, 129, 0.2); animation-delay: -5s; }
+        @keyframes floatOrb { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(10vw, 10vh) scale(1.1); } }
 
         /* =========================================
-           3. MAIN LAYOUT & SCREENS
+           3. MAIN LAYOUT & FORMS
         ========================================= */
         #app { display: flex; flex-direction: column; min-height: 100vh; max-width: 800px; margin: 0 auto; padding-bottom: 20px; z-index: 1; position: relative; }
-        .screen { display: none; flex-direction: column; flex: 1; padding: 20px; animation: slideUpFade 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .screen { display: none; flex-direction: column; flex: 1; padding: 15px; width: 100%; animation: slideUpFade 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); will-change: opacity, transform; }
         .screen.active { display: flex; }
-        @keyframes slideUpFade { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* =========================================
-           4. TYPOGRAPHY & FORMS
-        ========================================= */
-        h1 { font-size: 3em; margin-top: 20px; text-align: center; background: linear-gradient(45deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        h2, h3 { text-align: center; margin-bottom: 20px; }
-        .tagline { text-align: center; color: var(--text-muted); margin-bottom: 30px; font-size: 1.2em; }
+        h1 { font-size: clamp(2em, 8vw, 3em); margin-top: 20px; text-align: center; background: linear-gradient(45deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.2; }
+        h2 { font-size: clamp(1.5em, 6vw, 2em); text-align: center; margin-bottom: 20px; }
+        .tagline { text-align: center; color: var(--text-muted); margin-bottom: 30px; font-size: clamp(1em, 4vw, 1.2em); }
         
-        .card { background: var(--bg-panel); padding: 30px; border-radius: var(--radius); margin-bottom: 20px; backdrop-filter: blur(15px); border: var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
-        
-        input, select, button { width: 100%; padding: 16px; margin-bottom: 15px; border-radius: var(--radius); border: none; font-size: 16px; outline: none; transition: all 0.3s ease; }
-        input, select { background: rgba(0,0,0,0.2); color: var(--text-light); border: 2px solid transparent; }
+        .card { background: var(--bg-panel); padding: clamp(15px, 5vw, 30px); border-radius: var(--radius); margin-bottom: 20px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+        input, select, button { width: 100%; padding: 16px; margin-bottom: 15px; border-radius: var(--radius); border: none; font-size: 16px; outline: none; transition: all 0.2s ease; touch-action: manipulation; }
+        input, select { background: rgba(0,0,0,0.3); color: var(--text-light); border: 2px solid transparent; }
         .light-mode input, .light-mode select { background: rgba(0,0,0,0.05); }
-        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 15px var(--primary-glow); transform: translateY(-2px); }
+        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 15px var(--primary-glow); }
 
-        .btn { background: linear-gradient(45deg, var(--primary), #2563eb); color: white; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px var(--primary-glow); text-transform: uppercase; letter-spacing: 1.5px; }
-        .btn:hover { transform: translateY(-4px); box-shadow: 0 8px 25px var(--primary-glow); }
-        .btn:active { transform: translateY(1px); }
-        .btn:disabled { background: #334155; cursor: not-allowed; box-shadow: none; color: #94a3b8; transform: none; }
+        .btn { background: linear-gradient(45deg, var(--primary), #2563eb); color: white; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px var(--primary-glow); text-transform: uppercase; letter-spacing: 1px; }
+        .btn:active { transform: scale(0.98); }
+        .btn:disabled { background: #334155; cursor: not-allowed; box-shadow: none; color: #94a3b8; }
         .btn-secondary { background: rgba(255,255,255,0.1); color: var(--text-light); border: var(--glass-border); box-shadow: none;}
         .light-mode .btn-secondary { background: rgba(0,0,0,0.05); }
-        .btn-secondary:hover { background: rgba(255,255,255,0.2); }
         .btn-accent { background: linear-gradient(45deg, var(--accent), #059669); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); }
-        
-        /* New Custom Viral Button Style */
         .btn-viral { background: linear-gradient(45deg, #8b5cf6, #d946ef); box-shadow: 0 4px 15px rgba(217, 70, 239, 0.4); }
-        .btn-viral:hover { box-shadow: 0 8px 25px rgba(217, 70, 239, 0.6); }
 
         /* =========================================
-           5. SYSTEM BAR, AVATARS & LOBBY
+           4. AVATARS & UI ELEMENTS
         ========================================= */
-        .sys-bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 25px; font-size: 15px; font-weight: bold; background: var(--bg-panel); border-radius: 30px; margin: 15px 20px; backdrop-filter: blur(10px); border: var(--glass-border); }
-        
-        .avatar-selector { display: flex; justify-content: space-around; margin-bottom: 20px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: var(--radius); }
-        .avatar-opt { font-size: 35px; cursor: pointer; padding: 5px; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); border-radius: 50%; filter: grayscale(100%) opacity(0.5); }
-        .avatar-opt:hover { filter: grayscale(50%) opacity(0.8); transform: scale(1.1); }
-        .avatar-opt.selected { filter: grayscale(0%) opacity(1); transform: scale(1.3); background: var(--primary-glow); box-shadow: 0 0 15px var(--primary-glow); }
+        .sys-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; font-size: clamp(12px, 3.5vw, 15px); font-weight: bold; background: var(--bg-panel); border-radius: 30px; margin: 10px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: var(--glass-border); }
+        .avatar-selector { display: flex; justify-content: space-around; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: var(--radius); }
+        .avatar-opt { font-size: clamp(30px, 8vw, 35px); cursor: pointer; padding: 5px; transition: transform 0.2s ease; border-radius: 50%; filter: grayscale(100%) opacity(0.5); touch-action: manipulation; }
+        .avatar-opt.selected { filter: grayscale(0%) opacity(1); transform: scale(1.2); background: var(--primary-glow); box-shadow: 0 0 15px var(--primary-glow); }
 
-        .code-display { font-size: 45px; letter-spacing: 10px; text-align: center; font-weight: bold; color: var(--accent); background: rgba(0,0,0,0.3); padding: 20px; border-radius: var(--radius); border: var(--glass-border); text-shadow: 0 0 15px rgba(16,185,129,0.4); }
-        .player-badge { display: flex; align-items: center; gap: 15px; font-size: 1.2em;}
-        .game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 20px; background: var(--bg-panel); border-radius: var(--radius); backdrop-filter: blur(10px); border: var(--glass-border); }
+        .code-display { font-size: clamp(30px, 10vw, 45px); letter-spacing: 8px; text-align: center; font-weight: bold; color: var(--accent); background: rgba(0,0,0,0.3); padding: 15px; border-radius: var(--radius); border: var(--glass-border); text-shadow: 0 0 10px rgba(16,185,129,0.4); }
+        .player-badge { display: flex; align-items: center; gap: 10px; font-size: clamp(1em, 4vw, 1.2em); flex-shrink: 0; }
+        .game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 15px; background: var(--bg-panel); border-radius: var(--radius); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: var(--glass-border); width: 100%; }
 
         /* =========================================
-           6. ADVANCED ANIMATED WARNINGS
+           5. TOASTS & MODALS
         ========================================= */
-        #toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-        .toast-msg { padding: 16px 30px; border-radius: 30px; font-weight: bold; font-size: 16px; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.3); backdrop-filter: blur(10px); display: flex; align-items: center; gap: 10px; animation: slideInDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        .toast-success { background: linear-gradient(45deg, var(--accent), #059669); border: 1px solid #34d399; }
-        .toast-error { background: linear-gradient(45deg, var(--danger), #b91c1c); border: 1px solid #f87171; animation: slideInDown 0.3s forwards, shakeError 0.5s 0.3s forwards; }
-        .toast-hide { animation: fadeOutUp 0.4s forwards; }
+        #toast-container { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; pointer-events: none; }
+        .toast-msg { padding: 12px 20px; border-radius: 20px; font-weight: bold; font-size: 14px; color: white; box-shadow: 0 5px 15px rgba(0,0,0,0.3); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; align-items: center; gap: 10px; pointer-events: auto; animation: slideInDown 0.3s forwards; }
+        .toast-success { background: linear-gradient(45deg, var(--accent), #059669); }
+        .toast-error { background: linear-gradient(45deg, var(--danger), #b91c1c); }
+        .toast-info { background: linear-gradient(45deg, #8b5cf6, #3b82f6); }
+        .toast-hide { animation: fadeOutUp 0.3s forwards; }
 
-        @keyframes slideInDown { 0% { opacity: 0; transform: translateY(-50px); } 100% { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeOutUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-50px); } }
-        @keyframes shakeError { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-10px); } 40%, 80% { transform: translateX(10px); } }
-
-        /* =========================================
-           7. MODALS
-        ========================================= */
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(8px); animation: fadeIn 0.3s ease; }
-        .modal-content { background: var(--bg-panel); padding: 30px; border-radius: var(--radius); width: 90%; max-width: 450px; position: relative; border: var(--glass-border); box-shadow: 0 25px 50px rgba(0,0,0,0.5); animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 30px; cursor: pointer; color: var(--text-muted); transition: 0.2s; }
-        .close-btn:hover { color: var(--danger); transform: scale(1.2) rotate(90deg); }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
+        .modal-content { background: var(--bg-panel); padding: 25px; border-radius: var(--radius); width: 90%; max-width: 400px; position: relative; border: var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 28px; cursor: pointer; color: var(--text-muted); }
         .toggle-switch { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; font-size: 1.2em; font-weight: bold; }
         .switch-input { width: 30px; height: 30px; cursor: pointer; accent-color: var(--primary); }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes modalPop { from { opacity: 0; transform: scale(0.8) translateY(30px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        
+        .player-list-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 12px; border-radius: var(--radius); margin-bottom: 8px; border: var(--glass-border); }
+        .btn-small { padding: 8px 12px; font-size: 13px; margin-bottom: 0; border-radius: 8px; }
 
         /* =========================================
-           8. CHAT & GAME BOARDS
+           6. GAME BOARDS & CHAT
         ========================================= */
-        .board-container { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; min-height: 350px; margin-bottom: 20px;}
+        .board-container { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; min-height: 45vh; margin-bottom: 15px;}
         
-        /* Tic Tac Toe */
-        .ttt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 320px; }
-        .ttt-cell { aspect-ratio: 1; background: var(--bg-panel); display: flex; justify-content: center; align-items: center; font-size: 45px; border-radius: var(--radius); cursor: pointer; transition: 0.3s; border: var(--glass-border); }
-        .ttt-cell:hover { background: var(--primary); transform: scale(1.05); }
-        .ttt-win { background: var(--accent) !important; color: white; animation: pulseWin 1s infinite alternate; }
+        .ttt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(5px, 2vw, 12px); width: 100%; max-width: 320px; aspect-ratio: 1; margin: 0 auto; }
+        .ttt-cell { background: var(--bg-panel); display: flex; justify-content: center; align-items: center; font-size: clamp(30px, 12vw, 45px); border-radius: var(--radius); cursor: pointer; border: var(--glass-border); touch-action: manipulation; transition: background 0.2s; }
+        .ttt-win { background: var(--accent) !important; color: white; animation: pulseWin 0.8s infinite alternate; }
 
-        /* Memory */
-        .memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%; max-width: 360px; }
-        .memory-card { aspect-ratio: 1; background: var(--bg-panel); display: flex; justify-content: center; align-items: center; font-size: 30px; border-radius: var(--radius); cursor: pointer; transition: 0.4s transform; transform-style: preserve-3d; border: var(--glass-border); }
-        .memory-card:hover { transform: scale(1.05); border-color: var(--primary); }
+        .memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(5px, 2vw, 10px); width: 100%; max-width: 360px; aspect-ratio: 1; margin: 0 auto; }
+        .memory-card { background: var(--bg-panel); display: flex; justify-content: center; align-items: center; font-size: clamp(24px, 8vw, 35px); border-radius: 12px; cursor: pointer; transition: 0.3s transform; transform-style: preserve-3d; border: var(--glass-border); touch-action: manipulation; }
         .memory-card.flipped { background: var(--primary); transform: rotateY(180deg); }
         .memory-card.matched { opacity: 0.2; pointer-events: none; transform: scale(0.9); border-color: transparent; }
 
-        @keyframes pulseWin { from { transform: scale(1); box-shadow: 0 0 10px var(--accent); } to { transform: scale(1.05); box-shadow: 0 0 25px var(--accent); } }
+        /* SNAKE SPECIFIC CSS */
+        #snake-canvas { background: rgba(0,0,0,0.5); border: 2px solid var(--glass-border); border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.5); max-width: 100%; touch-action: none;}
+        .snake-controls { display: grid; grid-template-columns: 60px 60px 60px; grid-template-rows: 60px 60px; gap: 10px; margin-top: 15px; justify-content: center; }
+        .d-btn { background: var(--bg-panel); border: var(--glass-border); color: white; border-radius: 12px; font-size: 24px; display: flex; justify-content: center; align-items: center; cursor: pointer; touch-action: manipulation; }
+        .d-btn:active { background: var(--primary); transform: scale(0.9); }
+        .d-up { grid-column: 2; grid-row: 1; } .d-left { grid-column: 1; grid-row: 2; } .d-down { grid-column: 2; grid-row: 2; } .d-right { grid-column: 3; grid-row: 2; }
 
-        /* Chat */
-        .chat-box { height: 220px; background: var(--bg-panel); border-radius: var(--radius); display: flex; flex-direction: column; overflow: hidden; border: var(--glass-border); box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
-        .chat-messages { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; font-size: 15px; scroll-behavior: smooth; }
-        .chat-input-area { display: flex; background: rgba(0,0,0,0.4); padding: 8px; position: relative; }
-        .typing-indicator { position: absolute; top: -25px; left: 15px; font-size: 13px; color: var(--accent); font-style: italic; display: none; }
-        .chat-input-area input { margin: 0; border-radius: var(--radius) 0 0 var(--radius); flex: 1; background: transparent; padding: 15px; }
-        .chat-input-area button { width: 70px; margin: 0; border-radius: 0 var(--radius) var(--radius) 0; background: var(--primary); font-size: 20px;}
-        .msg { padding: 10px 15px; border-radius: 15px; width: fit-content; max-width: 80%; word-wrap: break-word; line-height: 1.4; }
+        .chat-box { height: clamp(150px, 20vh, 200px); background: var(--bg-panel); border-radius: var(--radius); display: flex; flex-direction: column; overflow: hidden; border: var(--glass-border); width: 100%; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; scroll-behavior: smooth; }
+        .chat-input-area { display: flex; background: rgba(0,0,0,0.5); padding: 5px; position: relative; }
+        .typing-indicator { position: absolute; top: -20px; left: 10px; font-size: 11px; color: var(--accent); font-style: italic; display: none; }
+        .chat-input-area input { margin: 0; border-radius: 12px 0 0 12px; flex: 1; padding: 12px; background: transparent; }
+        .chat-input-area button { width: 60px; margin: 0; border-radius: 0 12px 12px 0; background: var(--primary); font-size: 18px; }
+        .msg { padding: 8px 12px; border-radius: 12px; width: fit-content; max-width: 85%; word-wrap: break-word; line-height: 1.4; }
         .msg.me { background: var(--primary); align-self: flex-end; border-bottom-right-radius: 2px; }
         .msg.them { background: rgba(255,255,255,0.1); align-self: flex-start; border-bottom-left-radius: 2px; }
-        .light-mode .msg.them { background: rgba(0,0,0,0.1); color: #000; }
-        .msg.sys { background: transparent; color: var(--accent); font-size: 13px; align-self: center; font-weight: bold; }
+        .msg.sys { background: transparent; color: var(--accent); font-size: 12px; align-self: center; font-weight: bold; text-align: center; }
 
-        /* Emojis */
-        .emoji-bar { display: flex; justify-content: center; gap: 20px; padding: 15px; background: var(--bg-panel); border-radius: var(--radius); margin-bottom: 20px; font-size: 30px; border: var(--glass-border); }
-        .emoji-bar span { cursor: pointer; transition: transform 0.2s; }
-        .emoji-bar span:hover { transform: scale(1.5) translateY(-5px); }
-        .floating-emoji { position: fixed; font-size: 50px; pointer-events: none; animation: floatEmoji 2.5s ease-out forwards; z-index: 500; }
-        @keyframes floatEmoji { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-200px) scale(2); } }
-
+        .emoji-bar { display: flex; justify-content: space-around; padding: 10px; background: var(--bg-panel); border-radius: var(--radius); margin-bottom: 15px; font-size: clamp(24px, 6vw, 30px); border: var(--glass-border); width: 100%; }
+        .emoji-bar span { cursor: pointer; touch-action: manipulation; transition: transform 0.1s; }
+        .emoji-bar span:active { transform: scale(1.3); }
+        .floating-emoji { position: fixed; font-size: 40px; pointer-events: none; animation: floatEmoji 2s ease-out forwards; z-index: 500; will-change: transform, opacity; }
+        @keyframes pulseWin { from { transform: scale(1); box-shadow: 0 0 10px var(--accent); } to { transform: scale(1.05); box-shadow: 0 0 25px var(--accent); } }
+        @keyframes floatEmoji { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-150px) scale(2); } }
         #confetti-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 999; }
     </style>
 </head>
@@ -183,23 +134,21 @@
 
 <div class="bg-orb orb-1"></div>
 <div class="bg-orb orb-2"></div>
-
 <canvas id="confetti-canvas"></canvas>
-
 <div id="toast-container"></div>
 
 <div class="sys-bar" id="sys-bar" style="display: none;">
-    <span id="local-stats">🏆 Lifetime Wins: 0</span>
+    <span id="local-stats">🏆 Wins: 0</span>
     <span id="ping-display">📶 <span style="color:var(--text-muted)">-- ms</span></span>
 </div>
 
 <div id="app">
     <section id="screen-home" class="screen active">
-        <h1>🎮 P2P Pro Max Hub</h1>
-        <p class="tagline">The Ultimate Uncompressed WebRTC Engine.</p>
+        <h1>🎮 P2P Pro Max</h1>
+        <p class="tagline">Ultra Fast. Zero Lag. Mobile Perfect.</p>
         
         <div class="card">
-            <h3 style="color:var(--text-muted);">Select Your Avatar</h3>
+            <h3 style="color:var(--text-muted); font-size: 14px;">Select Your Avatar</h3>
             <div class="avatar-selector">
                 <span class="avatar-opt selected" onclick="selectAvatar(event, '🦊')">🦊</span>
                 <span class="avatar-opt" onclick="selectAvatar(event, '🐼')">🐼</span>
@@ -210,382 +159,362 @@
             <input type="text" id="player-name" placeholder="Enter Your Hero Name" maxlength="15">
         </div>
         
-        <button class="btn" onclick="navigateToCreate()">Create New Room</button>
-        <button class="btn btn-secondary" onclick="navigateToJoin()">Join Existing Room</button>
+        <button class="btn btn-viral" onclick="vibrateDevice(); openOnlineLobby();" style="margin-bottom: 15px;">🌐 See Online Players</button>
+        <button class="btn" onclick="vibrateDevice(); navigateToCreate();">Create New Room</button>
+        <button class="btn btn-secondary" onclick="vibrateDevice(); navigateToJoin();">Join Existing Room</button>
         
-        <div style="display: flex; gap: 15px; margin-top: 20px;">
-            <button class="btn btn-secondary" onclick="openModal('modal-settings')">⚙️ Settings</button>
-            <button class="btn btn-secondary" onclick="openModal('modal-instructions')">📖 How to Play</button>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button class="btn btn-secondary" onclick="vibrateDevice(); openModal('modal-settings')">⚙️ Settings</button>
+            <button class="btn btn-secondary" onclick="vibrateDevice(); openModal('modal-instructions')">📖 Help</button>
         </div>
     </section>
 
+    <section id="screen-online-lobby" class="screen">
+        <h2>🌐 Local Network Players</h2>
+        <div class="card" style="flex: 1; overflow-y: auto; max-height: 50vh; padding: 10px;" id="online-players-list"></div>
+        <button class="btn btn-secondary" onclick="vibrateDevice(); changeScreen('screen-home'); clearInterval(lobbyUpdateInterval);">🔙 Back</button>
+    </section>
+
     <section id="screen-create" class="screen">
-        <h2>Host a Game Session</h2>
-        
+        <h2>Host a Game</h2>
         <div class="card" id="create-form">
-            <h3 style="text-align: left; color: var(--text-muted); font-size: 16px;">Choose Game Mode:</h3>
+            <h3 style="text-align: left; color: var(--text-muted); font-size: 14px;">Choose Mode:</h3>
             <select id="game-select">
+                <option value="snake">Snake Battle 🐍 (NEW)</option>
                 <option value="ttt">Tic Tac Toe ❌⭕</option>
                 <option value="rps">Rock Paper Scissors 🪨📄✂️</option>
                 <option value="memory">Memory Card Match 🧠</option>
-                <option value="guess">Number Guess Battle 🔢</option>
-                <option value="quiz">Speed Quiz Battle ⏱️</option>
+                <option value="guess">Number Guess 🔢</option>
+                <option value="quiz">Speed Quiz ⏱️</option>
             </select>
-            <button class="btn btn-accent" onclick="startHostingProcess()" style="margin-top: 20px;">Generate Secure Code</button>
-            <button class="btn btn-secondary" onclick="changeScreen('screen-home')">Cancel & Go Back</button>
+            <button class="btn btn-accent" onclick="vibrateDevice(); startHostingProcess()" style="margin-top: 10px;">Generate Code</button>
+            <button class="btn btn-secondary" onclick="vibrateDevice(); changeScreen('screen-home')">Cancel</button>
         </div>
         
         <div class="card" id="create-waiting" style="display:none; text-align:center;">
-            <h3 style="color: var(--accent);">Room Successfully Initialized!</h3>
-            <p>Share this link or code with your friend:</p>
+            <h3 style="color: var(--accent); font-size: 1.2em;">Room Ready!</h3>
             <div class="code-display" id="display-code">------</div>
-            
-            <p id="host-status-text" style="color:var(--text-muted); margin-bottom: 25px;">
-                Establishing P2P Node... <span style="color:var(--warning);">●</span>
+            <p id="host-status-text" style="color:var(--text-muted); margin: 15px 0; font-size: 14px;">
+                Waiting for player... <span style="color:var(--warning);">●</span>
             </p>
-            
-            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                <button class="btn btn-secondary" onclick="copyRoomCode()">📋 Copy Link</button>
-                <button class="btn" style="background: #25D366;" onclick="shareViaWhatsApp()">💬 Share on WhatsApp</button>
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
+                <button class="btn" style="background: #25D366;" onclick="vibrateDevice(); shareViaWhatsApp()">💬 WhatsApp Share</button>
+                <button class="btn btn-secondary" onclick="vibrateDevice(); copyRoomCode()">📋 Copy Link</button>
             </div>
-            
-            <button class="btn btn-secondary" onclick="location.reload()" style="border-color:var(--danger); color:var(--danger)">Abort Connection</button>
+            <button class="btn btn-secondary" onclick="vibrateDevice(); abortHosting()" style="border-color:var(--danger); color:var(--danger)">Abort</button>
         </div>
     </section>
 
     <section id="screen-join" class="screen">
-        <h2>Join Active Session</h2>
+        <h2>Join Session</h2>
         <div class="card">
-            <h3 style="text-align: left; color: var(--text-muted); font-size: 16px;">Enter Host's Code:</h3>
-            <input type="text" id="join-code" placeholder="------" maxlength="6" style="text-align: center; font-size: 30px; letter-spacing: 15px; font-weight: bold;">
-            <button class="btn btn-accent" id="btn-join" onclick="startJoiningProcess()" style="margin-top: 20px;">Connect to Host</button>
-            <button class="btn btn-secondary" onclick="changeScreen('screen-home')">Cancel</button>
+            <input type="text" id="join-code" placeholder="------" maxlength="6" style="text-align: center; font-size: clamp(24px, 8vw, 30px); letter-spacing: 10px; font-weight: bold; text-transform: uppercase;">
+            <button class="btn btn-accent" id="btn-join" onclick="vibrateDevice(); startJoiningProcess()" style="margin-top: 15px;">Connect</button>
+            <button class="btn btn-secondary" onclick="vibrateDevice(); changeScreen('screen-home')">Cancel</button>
         </div>
     </section>
 
     <section id="screen-lobby" class="screen">
         <h2>Pre-Game Lobby</h2>
-        <div class="card">
-            <div style="display:flex; justify-content:space-between; margin-bottom:20px; align-items:center;">
-                <div class="player-badge">
-                    <span id="lobby-avatar-p1" style="font-size:40px;">🦊</span> 
-                    <span id="lobby-name-p1" style="font-size: 1.2em; font-weight: bold;">Host</span>
-                </div>
-                
-                <span style="color:var(--accent); font-weight:bold; font-size: 1.5em;">VS</span>
-                
-                <div class="player-badge">
-                    <span id="lobby-name-p2" style="font-size: 1.2em; font-weight: bold;">Guest</span> 
-                    <span id="lobby-avatar-p2" style="font-size:40px;">❓</span>
-                </div>
+        <div class="card" style="padding: 15px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="player-badge" style="flex-direction: column; gap: 5px;"><span id="lobby-avatar-p1" style="font-size: clamp(35px, 10vw, 45px);">🦊</span> <span id="lobby-name-p1" style="font-size: 14px; text-align:center;">Host</span></div>
+                <span style="color:var(--accent); font-weight:bold; font-size: clamp(20px, 6vw, 24px);">VS</span>
+                <div class="player-badge" style="flex-direction: column; gap: 5px;"><span id="lobby-avatar-p2" style="font-size: clamp(35px, 10vw, 45px);">❓</span> <span id="lobby-name-p2" style="font-size: 14px; text-align:center;">Guest</span></div>
             </div>
-            <p style="text-align: center; color: var(--text-muted);">Connection Secured via WebRTC Data Channels.</p>
         </div>
-        
-        <button class="btn btn-accent" id="btn-start-game" style="display:none; padding: 25px; font-size: 1.3em;" onclick="triggerGameStart()">Launch Game Engine</button>
-        <p id="guest-waiting-msg" style="text-align:center; display:none; color:var(--warning); font-size: 1.3em; font-weight: bold;">
-            Awaiting Host Configuration...
-        </p>
+        <button class="btn btn-accent" id="btn-start-game" style="display:none; padding: 20px; font-size: 1.2em;" onclick="vibrateDevice(); triggerGameStart()">Start Match</button>
+        <p id="guest-waiting-msg" style="text-align:center; display:none; color:var(--warning); font-size: 16px; margin-top: 20px;">Waiting for Host...</p>
     </section>
 
     <section id="screen-game" class="screen">
         <div class="game-header">
-            <div class="player-badge">
-                <span id="game-avatar-p1">🦊</span>
-                <span id="score-p1" style="color: var(--primary); font-size: 1.5em;">0</span>
+            <div class="player-badge"><span id="game-avatar-p1">🦊</span><span id="score-p1" style="color: var(--primary); font-weight: bold;">0</span></div>
+            <div style="text-align: center; flex: 1; padding: 0 10px;">
+                <span id="game-title-display" style="display:block; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Game</span>
+                <span id="game-turn-indicator" style="color:var(--accent); font-size: clamp(14px, 4vw, 18px); font-weight: bold;">Turn</span>
             </div>
-            
-            <div style="text-align: center;">
-                <span id="game-title-display" style="display:block; font-size: 0.8em; color: var(--text-muted); margin-bottom: 5px;">Tic Tac Toe</span>
-                <span id="game-turn-indicator" style="color:var(--accent); font-size: 1.3em;">Turn Manager</span>
-            </div>
-            
-            <div class="player-badge">
-                <span id="score-p2" style="color: var(--danger); font-size: 1.5em;">0</span>
-                <span id="game-avatar-p2">🐼</span>
-            </div>
+            <div class="player-badge"><span id="score-p2" style="color: var(--danger); font-weight: bold;">0</span><span id="game-avatar-p2">🐼</span></div>
         </div>
         
         <div id="board-container" class="board-container"></div>
         
-        <div class="emoji-bar" onclick="handleEmojiClick(event)">
-            <span>👍</span><span>😂</span><span>😲</span><span>😡</span><span>🎉</span><span>🔥</span>
-        </div>
-
-        <div class="chat-box">
+        <div class="emoji-bar" onclick="handleEmojiClick(event)"><span>👍</span><span>😂</span><span>😲</span><span>😡</span><span>🎉</span><span>🔥</span></div>
+        <div class="chat-box" id="chat-section">
             <div class="chat-messages" id="chat-messages"></div>
             <div class="chat-input-area">
-                <div class="typing-indicator" id="typing-indicator">Opponent is typing...</div>
-                <input type="text" id="chat-input" placeholder="Type your message here..." oninput="notifyTyping()" onkeypress="if(event.key==='Enter') sendChatMessage()">
-                <button onclick="sendChatMessage()">➤</button>
+                <div class="typing-indicator" id="typing-indicator">Typing...</div>
+                <input type="text" id="chat-input" placeholder="Message..." oninput="notifyTyping()" onkeypress="if(event.key==='Enter') sendChatMessage()">
+                <button onclick="vibrateDevice(20); sendChatMessage()">➤</button>
             </div>
         </div>
     </section>
 
     <section id="screen-result" class="screen" style="text-align:center; justify-content:center;">
-        <h1 id="result-title" style="font-size:5em; margin-bottom: 10px;">Victory!</h1>
-        <p id="result-subtitle" style="margin-bottom:30px; color:var(--text-muted); font-size: 1.5em;">Match concluded successfully.</p>
-        
-        <button class="btn btn-accent" id="btn-rematch" onclick="sendRematchRequest()" style="padding: 25px; font-size: 1.3em; margin-bottom: 15px;">Request Rematch</button>
-        
-        <button class="btn btn-viral" onclick="createNewRoomFromResult()" style="padding: 20px; font-size: 1.2em; margin-bottom: 15px;">✨ Create Your Own Room</button>
-        
-        <button class="btn btn-secondary" onclick="location.reload()">Terminate Session & Exit</button>
+        <h1 id="result-title" style="font-size: clamp(3em, 15vw, 5em); margin-bottom: 20px;">Victory!</h1>
+        <button class="btn btn-accent" id="btn-rematch" onclick="vibrateDevice(); sendRematchRequest()" style="padding: 20px; font-size: 1.2em; margin-bottom: 15px;">Request Rematch</button>
+        <button class="btn btn-secondary" onclick="vibrateDevice(); abortHosting()">Exit Room</button>
     </section>
 </div>
 
 <div class="modal-overlay" id="modal-settings">
     <div class="modal-content">
-        <span class="close-btn" onclick="closeModal('modal-settings')">&times;</span>
-        <h2>System Settings</h2>
-        
-        <div class="toggle-switch">
-            <span>🎵 Master Audio Effects</span>
-            <input type="checkbox" id="setting-sound" class="switch-input" checked onchange="toggleSoundSetting()">
-        </div>
-        
-        <div class="toggle-switch">
-            <span>☀️ Enable Light Theme</span>
-            <input type="checkbox" id="setting-theme" class="switch-input" onchange="toggleThemeSetting()">
-        </div>
-        
-        <p style="text-align: center; color: var(--text-muted); font-size: 14px; margin-top: 30px;">Changes are applied immediately.</p>
+        <span class="close-btn" onclick="vibrateDevice(20); closeModal('modal-settings')">&times;</span>
+        <h2 style="font-size: 20px;">Settings</h2>
+        <div class="toggle-switch"><span style="font-size: 15px;">🎵 Sound Effects</span><input type="checkbox" id="setting-sound" class="switch-input" checked onchange="toggleSoundSetting()"></div>
+        <div class="toggle-switch"><span style="font-size: 15px;">📳 Haptic Vibration</span><input type="checkbox" id="setting-vibration" class="switch-input" checked onchange="toggleVibSetting()"></div>
+        <div class="toggle-switch"><span style="font-size: 15px;">☀️ Light Theme</span><input type="checkbox" id="setting-theme" class="switch-input" onchange="toggleThemeSetting()"></div>
     </div>
 </div>
-
 <div class="modal-overlay" id="modal-instructions">
     <div class="modal-content">
-        <span class="close-btn" onclick="closeModal('modal-instructions')">&times;</span>
-        <h2>How To Play P2P</h2>
-        <ul style="line-height: 1.8; color: var(--text-light); margin-left: 20px; font-size: 16px;">
-            <li>This app uses <b>WebRTC</b>. No central game server exists.</li>
-            <li><b>Player 1 (Host)</b> creates a room and sends the link/code.</li>
-            <li><b>Player 2 (Guest)</b> opens the link to establish a direct connection.</li>
-            <li>Once connected, the connection is <b>Peer-to-Peer</b>. It's lightning fast!</li>
-            <li>Do not close the browser tab, or the connection will drop.</li>
+        <span class="close-btn" onclick="vibrateDevice(20); closeModal('modal-instructions')">&times;</span>
+        <h2 style="font-size: 20px;">How To Play</h2>
+        <ul style="line-height: 1.6; color: var(--text-light); margin-left: 15px; font-size: 14px;">
+            <li>This uses <b>WebRTC P2P</b>. Direct connection, zero servers!</li>
+            <li>Ensure you have a stable internet connection.</li>
+            <li>Do not close the browser tab during a match.</li>
         </ul>
     </div>
 </div>
 
 <script>
-    /* 1. GLOBAL APP STATE & VARIABLES */
-    const APP_PREFIX = "p2p-promax-ultimate-v1-";
-    let peerConnection = null;
-    let dataChannel = null;
-    let audioContext = null;
-    let networkPingInterval;
-    let typingTimeout;
-    
-    let sys = { isHost: false, myId: '', myName: '', oppName: '', myAv: '🦊', oppAv: '❓', roomCode: '', gameType: '', scores: { p1: 0, p2: 0 }, isBoardLocked: false, sound: true };
+    const APP_PREFIX = "p2p-ult-v2-";
+    let peerConnection = null; let dataChannel = null; let audioContext = null; let networkPingInterval; let typingTimeout;
+    let sys = { isHost: false, myId: '', myName: '', oppName: '', myAv: '🦊', oppAv: '❓', roomCode: '', gameType: '', scores: { p1: 0, p2: 0 }, isBoardLocked: false, sound: true, vibration: true };
     let gameState = {}; 
     let localStats = JSON.parse(localStorage.getItem('p2p_ultimate_stats')) || { totalWins: 0 };
-    document.getElementById('local-stats').innerText = `🏆 Lifetime Wins: ${localStats.totalWins}`;
+    document.getElementById('local-stats').innerText = `🏆 Wins: ${localStats.totalWins}`;
 
-    /* 2. AUTO-JOIN VIA LINK LOGIC */
+    function vibrateDevice(pattern = 40) { if (sys.vibration && navigator.vibrate) navigator.vibrate(pattern); }
+    function toggleVibSetting() { sys.vibration = document.getElementById('setting-vibration').checked; if(sys.vibration) vibrateDevice([30, 50, 30]); showToast(sys.vibration ? "Vibration Enabled" : "Vibration Disabled"); }
+
     window.onload = () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const roomFromUrl = urlParams.get('room');
-        
-        if (roomFromUrl && roomFromUrl.length === 6) {
-            document.getElementById('join-code').value = roomFromUrl;
-            changeScreen('screen-join');
-            setTimeout(() => {
-                showToast("Room link detected! Enter your name to join.");
-            }, 500);
-        }
+        const urlParams = new URLSearchParams(window.location.search); const roomFromUrl = urlParams.get('room'); const savedHostState = sessionStorage.getItem('p2p_host_state');
+        if (savedHostState) {
+            const state = JSON.parse(savedHostState); sys.myName = state.name; sys.myAv = state.avatar; sys.gameType = state.gameType; sys.roomCode = state.roomCode;
+            document.getElementById('player-name').value = sys.myName; document.getElementById('sys-bar').style.display = 'flex'; sys.isHost = true; sys.myId = 'p1';
+            document.getElementById('create-form').style.display = 'none'; document.getElementById('create-waiting').style.display = 'block'; document.getElementById('display-code').innerText = sys.roomCode;
+            changeScreen('screen-create');
+            initializePeer(APP_PREFIX + sys.roomCode, () => { document.getElementById('host-status-text').innerHTML = `Waiting for player... <span style="color:var(--accent);">●</span>`; });
+            peerConnection.on('connection', (channel) => { setupDataChannel(channel); });
+        } else if (roomFromUrl && roomFromUrl.length === 6) { document.getElementById('join-code').value = roomFromUrl; changeScreen('screen-join'); setTimeout(() => { showToast("Room link detected!"); }, 500); }
+        registerAsOnline();
     };
 
-    /* 3. UI NAVIGATION & SETTINGS */
-    function changeScreen(screenId) { document.querySelectorAll('.screen').forEach(screen => { screen.classList.remove('active'); }); document.getElementById(screenId).classList.add('active'); }
+    let myGlobalId = "user_" + Math.random().toString(36).substr(2, 9); let lobbyUpdateInterval;
+    function registerAsOnline() { setInterval(() => { if(!sys.myName) return; let onlineList = JSON.parse(localStorage.getItem('p2p_online_users')) || {}; onlineList[myGlobalId] = { name: sys.myName, avatar: sys.myAv, timestamp: Date.now() }; localStorage.setItem('p2p_online_users', JSON.stringify(onlineList)); }, 3000); }
+    function openOnlineLobby() { if (!validateUserSetup()) return; changeScreen('screen-online-lobby'); renderOnlinePlayers(); lobbyUpdateInterval = setInterval(renderOnlinePlayers, 3000); }
+    function renderOnlinePlayers() { let onlineList = JSON.parse(localStorage.getItem('p2p_online_users')) || {}; const container = document.getElementById('online-players-list'); container.innerHTML = ''; let found = false; const now = Date.now(); for (let id in onlineList) { if (id !== myGlobalId && (now - onlineList[id].timestamp < 10000)) { found = true; const p = onlineList[id]; container.innerHTML += `<div class="player-list-item"><div style="display:flex; align-items:center; gap:10px;"><span style="font-size:25px;">${p.avatar}</span><div><div style="font-weight:bold; font-size:14px;">${p.name}</div><div style="font-size:11px; color:var(--accent);">🟢 Online</div></div></div><button class="btn btn-accent btn-small" onclick="vibrateDevice(); sendFriendRequest('${id}', '${p.name}')">Play</button></div>`; } } if (!found) container.innerHTML = `<p style="text-align:center; color:var(--text-muted); font-size: 13px; margin-top:20px;">No local network players found.</p>`; }
+    window.addEventListener('storage', (e) => { if (e.key === 'p2p_game_request') { const req = JSON.parse(e.newValue); if (req && req.targetId === myGlobalId) showIncomingRequest(req); } if (e.key === 'p2p_request_accepted') { const res = JSON.parse(e.newValue); if (res && res.senderId === myGlobalId) { document.getElementById('join-code').value = res.roomCode; startJoiningProcess(); } } });
+    function sendFriendRequest(targetId, targetName) { showToast(`Request sent to ${targetName}!`, false); localStorage.setItem('p2p_game_request', JSON.stringify({ senderId: myGlobalId, targetId: targetId, senderName: sys.myName, senderAv: sys.myAv, timestamp: Date.now() })); }
+    function showIncomingRequest(req) { vibrateDevice([50, 100, 50, 100, 50]); const container = document.getElementById('toast-container'); const toast = document.createElement('div'); toast.className = `toast-msg toast-info`; toast.style.flexDirection = 'column'; toast.innerHTML = `<div style="margin-bottom:8px;">🎮 <b>${req.senderAv} ${req.senderName}</b> wants to play!</div><div style="display:flex; gap:10px; width:100%;"><button class="btn btn-accent btn-small" style="flex:1;" onclick="vibrateDevice(); acceptRequest('${req.senderId}'); this.parentElement.parentElement.remove();">Accept</button><button class="btn btn-secondary btn-small" style="flex:1;" onclick="vibrateDevice(); this.parentElement.parentElement.remove()">Decline</button></div>`; container.appendChild(toast); playSound('click'); setTimeout(() => toast.remove(), 10000); }
+    function acceptRequest(senderId) { document.getElementById('game-select').value = 'snake'; startHostingProcess(); setTimeout(() => { localStorage.setItem('p2p_request_accepted', JSON.stringify({ senderId: senderId, roomCode: sys.roomCode, timestamp: Date.now() })); }, 1000); }
+
+    function changeScreen(screenId) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(screenId).classList.add('active'); }
     function openModal(modalId) { document.getElementById(modalId).style.display = 'flex'; }
     function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
-    function selectAvatar(event, emoji) { document.querySelectorAll('.avatar-opt').forEach(el => el.classList.remove('selected')); event.target.classList.add('selected'); sys.myAv = emoji; }
-    function validateUserSetup() { const nameInput = document.getElementById('player-name').value.trim(); if (!nameInput) { showToast("Please enter your Hero Name first!", true); return false; } sys.myName = nameInput; document.getElementById('sys-bar').style.display = 'flex'; return true; }
+    function selectAvatar(event, emoji) { vibrateDevice(10); document.querySelectorAll('.avatar-opt').forEach(el => el.classList.remove('selected')); event.target.classList.add('selected'); sys.myAv = emoji; }
+    function validateUserSetup() { const nameInput = document.getElementById('player-name').value.trim(); if (!nameInput) { showToast("Enter your Hero Name first!", true); vibrateDevice([50, 50, 50]); return false; } sys.myName = nameInput; document.getElementById('sys-bar').style.display = 'flex'; return true; }
     function navigateToCreate() { if (validateUserSetup()) changeScreen('screen-create'); }
     function navigateToJoin() { if (validateUserSetup()) changeScreen('screen-join'); }
-    function toggleSoundSetting() { sys.sound = document.getElementById('setting-sound').checked; showToast(sys.sound ? "Sound Enabled" : "Sound Muted"); }
-    function toggleThemeSetting() { const isLightMode = document.getElementById('setting-theme').checked; if (isLightMode) { document.body.classList.add('light-mode'); } else { document.body.classList.remove('light-mode'); } }
-    
-    /* 4. SHARING & VIRAL FEATURES */
-    function copyRoomCode() { 
-        const inviteLink = window.location.origin + window.location.pathname + '?room=' + sys.roomCode;
-        navigator.clipboard.writeText(inviteLink); 
-        showToast("Invite Link copied to clipboard! 📋"); 
-    }
-    
-    function shareViaWhatsApp() { 
-        const inviteLink = window.location.origin + window.location.pathname + '?room=' + sys.roomCode;
-        const text = `Hey! 🎮 Play a multiplayer game with me without downloading any app. Click this link to join my room directly: ${inviteLink}`; 
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank'); 
-    }
+    function toggleSoundSetting() { sys.sound = document.getElementById('setting-sound').checked; vibrateDevice(20); }
+    function toggleThemeSetting() { const isLightMode = document.getElementById('setting-theme').checked; vibrateDevice(20); if (isLightMode) document.body.classList.add('light-mode'); else document.body.classList.remove('light-mode'); }
+    function copyRoomCode() { const inviteLink = window.location.origin + window.location.pathname + '?room=' + sys.roomCode; navigator.clipboard.writeText(inviteLink); showToast("Link copied! 📋"); }
+    function shareViaWhatsApp() { const inviteLink = window.location.origin + window.location.pathname + '?room=' + sys.roomCode; const text = `🎮 Play this game with me directly in browser: ${inviteLink}`; window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank'); }
+    function abortHosting() { sessionStorage.removeItem('p2p_host_state'); location.href = window.location.origin + window.location.pathname; }
 
-    function createNewRoomFromResult() {
-        // Removes the ?room= parameter and reloads the page fresh to the home screen
-        window.location.href = window.location.origin + window.location.pathname;
-    }
+    function showToast(message, isError = false) { const container = document.getElementById('toast-container'); const toast = document.createElement('div'); toast.className = `toast-msg ${isError ? 'toast-error' : 'toast-success'}`; toast.innerHTML = isError ? `❌ ${message}` : `✅ ${message}`; container.appendChild(toast); playSound(isError ? 'error' : 'click'); setTimeout(() => { toast.classList.add('toast-hide'); setTimeout(() => toast.remove(), 300); }, 2500); }
+    function playSound(type) { if (!sys.sound) return; if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)(); const osc = audioContext.createOscillator(); const gain = audioContext.createGain(); osc.connect(gain); gain.connect(audioContext.destination); if (type === 'click') { osc.frequency.setValueAtTime(600, audioContext.currentTime); osc.frequency.exponentialRampToValueAtTime(1000, audioContext.currentTime + 0.1); gain.gain.setValueAtTime(0.1, audioContext.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1); osc.start(); osc.stop(audioContext.currentTime + 0.1); } else if (type === 'win') { osc.frequency.setValueAtTime(400, audioContext.currentTime); osc.frequency.setValueAtTime(800, audioContext.currentTime + 0.1); osc.frequency.setValueAtTime(1200, audioContext.currentTime + 0.2); gain.gain.setValueAtTime(0.2, audioContext.currentTime); gain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.6); osc.start(); osc.stop(audioContext.currentTime + 0.6); } else if (type === 'error') { osc.type = 'square'; osc.frequency.setValueAtTime(200, audioContext.currentTime); osc.frequency.linearRampToValueAtTime(100, audioContext.currentTime + 0.2); gain.gain.setValueAtTime(0.1, audioContext.currentTime); gain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.2); osc.start(); osc.stop(audioContext.currentTime + 0.2); } }
+    function triggerConfetti() { const canvas = document.getElementById('confetti-canvas'); const ctx = canvas.getContext('2d'); canvas.width = window.innerWidth; canvas.height = window.innerHeight; let particles = []; const particleCount = window.innerWidth < 600 ? 70 : 150; for (let i=0; i<particleCount; i++) particles.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height - canvas.height, radius: Math.random()*5+2, dx: Math.random()*4-2, dy: Math.random()*5+2, color: `hsl(${Math.random()*360}, 100%, 50%)` }); function animateConfetti() { ctx.clearRect(0,0,canvas.width,canvas.height); let active = false; particles.forEach(p => { p.x += p.dx; p.y += p.dy; ctx.beginPath(); ctx.arc(p.x,p.y,p.radius,0,Math.PI*2); ctx.fillStyle = p.color; ctx.fill(); if(p.y < canvas.height) active = true; }); if(active) requestAnimationFrame(animateConfetti); else ctx.clearRect(0,0,canvas.width,canvas.height); } animateConfetti(); }
 
-    /* 5. AUDIO & ANIMATION ENGINES */
-    function showToast(message, isError = false) {
-        const container = document.getElementById('toast-container');
-        const toast = document.createElement('div');
-        toast.className = `toast-msg ${isError ? 'toast-error' : 'toast-success'}`;
-        toast.innerHTML = isError ? `❌ ${message}` : `✅ ${message}`;
-        container.appendChild(toast);
-        playSound(isError ? 'error' : 'click');
-        setTimeout(() => { toast.classList.add('toast-hide'); setTimeout(() => toast.remove(), 400); }, 3000);
-    }
-
-    function playSound(type) {
-        if (!sys.sound) return;
-        if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        oscillator.connect(gainNode); gainNode.connect(audioContext.destination);
-        if (type === 'click') { oscillator.frequency.setValueAtTime(600, audioContext.currentTime); oscillator.frequency.exponentialRampToValueAtTime(1000, audioContext.currentTime + 0.1); gainNode.gain.setValueAtTime(0.1, audioContext.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1); oscillator.start(); oscillator.stop(audioContext.currentTime + 0.1); } 
-        else if (type === 'win') { oscillator.frequency.setValueAtTime(400, audioContext.currentTime); oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.1); oscillator.frequency.setValueAtTime(1200, audioContext.currentTime + 0.2); gainNode.gain.setValueAtTime(0.2, audioContext.currentTime); gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.6); oscillator.start(); oscillator.stop(audioContext.currentTime + 0.6); } 
-        else if (type === 'error') { oscillator.type = 'square'; oscillator.frequency.setValueAtTime(200, audioContext.currentTime); oscillator.frequency.linearRampToValueAtTime(100, audioContext.currentTime + 0.2); gainNode.gain.setValueAtTime(0.1, audioContext.currentTime); gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.2); oscillator.start(); oscillator.stop(audioContext.currentTime + 0.2); }
-    }
-
-    function triggerConfetti() {
-        const canvas = document.getElementById('confetti-canvas'); const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        let particles = [];
-        for (let i = 0; i < 150; i++) { particles.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height - canvas.height, radius: Math.random() * 6 + 2, dx: Math.random() * 4 - 2, dy: Math.random() * 5 + 3, color: `hsl(${Math.random() * 360}, 100%, 50%)` }); }
-        function animateConfetti() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height); let isActive = false;
-            particles.forEach(p => { p.x += p.dx; p.y += p.dy; ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fillStyle = p.color; ctx.fill(); if (p.y < canvas.height) isActive = true; });
-            if (isActive) { requestAnimationFrame(animateConfetti); } else { ctx.clearRect(0, 0, canvas.width, canvas.height); }
-        } animateConfetti();
-    }
-
-    /* 6. WEBRTC NETWORK LOGIC */
-    function initializePeer(id, onSuccessCallback) {
-        peerConnection = new Peer(id, { reliable: true });
-        peerConnection.on('open', onSuccessCallback);
-        peerConnection.on('error', (err) => { console.error(err); showToast("Network Error: Could not connect to server.", true); document.getElementById('btn-join').disabled = false; document.getElementById('btn-join').innerText = "Connect to Host"; });
-    }
-
+    function initializePeer(id, onSuccessCallback) { if(peerConnection) peerConnection.destroy(); peerConnection = new Peer(id, { reliable: true }); peerConnection.on('open', onSuccessCallback); peerConnection.on('error', (err) => { console.error(err); showToast("Network Error", true); document.getElementById('btn-join').disabled = false; document.getElementById('btn-join').innerText = "Connect"; }); }
     function startNetworkPing() { networkPingInterval = setInterval(() => { if (dataChannel && dataChannel.open) { dataChannel.send({ type: 'network_ping', timestamp: Date.now() }); } }, 2000); }
+    function setupDataChannel(channel) { dataChannel = channel; dataChannel.on('open', () => { showToast("Connection Established!"); vibrateDevice([50, 100, 50]); startNetworkPing(); if (!sys.isHost) dataChannel.send({ type: 'system_join', name: sys.myName, avatar: sys.myAv }); }); dataChannel.on('data', (data) => routeNetworkData(data)); dataChannel.on('close', () => { clearInterval(networkPingInterval); showToast("Opponent Disconnected.", true); setTimeout(() => abortHosting(), 2000); }); }
 
-    function setupDataChannel(channel) {
-        dataChannel = channel;
-        dataChannel.on('open', () => { showToast("P2P Connection Established Successfully!"); startNetworkPing(); if (!sys.isHost) { dataChannel.send({ type: 'system_join', name: sys.myName, avatar: sys.myAv }); } });
-        dataChannel.on('data', (data) => routeNetworkData(data));
-        dataChannel.on('close', () => { clearInterval(networkPingInterval); showToast("Opponent disconnected from the session.", true); setTimeout(() => location.reload(), 2500); });
-    }
-
-    function startHostingProcess() {
-        sys.isHost = true; sys.myId = 'p1';
-        const selectBox = document.getElementById('game-select'); sys.gameType = selectBox.value;
-        const gameNameText = selectBox.options[selectBox.selectedIndex].text; document.getElementById('game-title-display').innerText = gameNameText;
-        sys.roomCode = Math.floor(100000 + Math.random() * 900000).toString();
-        document.getElementById('create-form').style.display = 'none'; document.getElementById('create-waiting').style.display = 'block'; document.getElementById('display-code').innerText = sys.roomCode;
-        initializePeer(APP_PREFIX + sys.roomCode, () => { document.getElementById('host-status-text').innerHTML = `Listening for incoming connections... <span style="color:var(--accent); animation: pulseWin 1s infinite alternate;">●</span>`; });
-        peerConnection.on('connection', (channel) => { setupDataChannel(channel); });
-    }
-
-    function startJoiningProcess() {
-        const codeInput = document.getElementById('join-code').value.trim();
-        if (codeInput.length !== 6) return showToast("Please enter a valid 6-digit code!", true);
-        document.getElementById('btn-join').disabled = true; document.getElementById('btn-join').innerText = "Establishing Connection...";
-        sys.isHost = false; sys.myId = 'p2'; sys.roomCode = codeInput;
-        initializePeer(undefined, () => { const channel = peerConnection.connect(APP_PREFIX + sys.roomCode, { reliable: true }); setupDataChannel(channel); });
-    }
+    function startHostingProcess() { sys.isHost = true; sys.myId = 'p1'; const selectBox = document.getElementById('game-select'); sys.gameType = selectBox.value; sys.roomCode = Math.floor(100000 + Math.random() * 900000).toString(); sessionStorage.setItem('p2p_host_state', JSON.stringify({ roomCode: sys.roomCode, gameType: sys.gameType, name: sys.myName, avatar: sys.myAv })); document.getElementById('create-form').style.display = 'none'; document.getElementById('create-waiting').style.display = 'block'; document.getElementById('display-code').innerText = sys.roomCode; initializePeer(APP_PREFIX + sys.roomCode, () => {}); peerConnection.on('connection', (channel) => { setupDataChannel(channel); }); }
+    function startJoiningProcess() { const codeInput = document.getElementById('join-code').value.trim().toUpperCase(); if (codeInput.length !== 6) return showToast("Enter 6-digit code!", true); document.getElementById('btn-join').disabled = true; document.getElementById('btn-join').innerText = "Connecting..."; sys.isHost = false; sys.myId = 'p2'; sys.roomCode = codeInput; initializePeer(undefined, () => { const channel = peerConnection.connect(APP_PREFIX + sys.roomCode, { reliable: true }); setupDataChannel(channel); }); }
 
     function routeNetworkData(data) {
         switch(data.type) {
             case 'network_ping': dataChannel.send({ type: 'network_pong', timestamp: data.timestamp }); break;
             case 'network_pong': const latency = Date.now() - data.timestamp; const color = latency < 100 ? 'var(--accent)' : (latency < 300 ? 'var(--warning)' : 'var(--danger)'); document.getElementById('ping-display').innerHTML = `📶 <span style="color:${color}">${latency}ms</span>`; break;
             case 'system_join': sys.oppName = data.name; sys.oppAv = data.avatar; dataChannel.send({ type: 'system_ack', name: sys.myName, avatar: sys.myAv, gameType: sys.gameType }); setupLobbyScreen(); break;
-            case 'system_ack': sys.oppName = data.name; sys.oppAv = data.avatar; sys.gameType = data.gameType; const gameMap = { ttt: "Tic Tac Toe", rps: "Rock Paper Scissors", memory: "Memory Match", guess: "Number Guess", quiz: "Speed Quiz" }; document.getElementById('game-title-display').innerText = gameMap[sys.gameType]; setupLobbyScreen(); break;
+            case 'system_ack': sys.oppName = data.name; sys.oppAv = data.avatar; sys.gameType = data.gameType; setupLobbyScreen(); break;
             case 'game_start': launchGameUI(); break;
             case 'chat_typing': document.getElementById('typing-indicator').style.display = 'block'; clearTimeout(typingTimeout); typingTimeout = setTimeout(() => document.getElementById('typing-indicator').style.display = 'none', 1500); break;
-            case 'chat_message': document.getElementById('typing-indicator').style.display = 'none'; renderChatMessage(sys.oppName, sys.oppAv, data.message, 'them'); break;
+            case 'chat_message': document.getElementById('typing-indicator').style.display = 'none'; vibrateDevice(30); renderChatMessage(sys.oppName, sys.oppAv, data.message, 'them'); break;
             case 'chat_emoji': renderFloatingEmoji(data.emoji, false); break;
-            case 'rematch_request': showToast(`Opponent requested a rematch!`); const btn = document.getElementById('btn-rematch'); btn.innerText = "Accept Rematch"; btn.onclick = () => { dataChannel.send({ type: 'rematch_accept' }); launchGameUI(); }; break;
+            case 'rematch_request': showToast(`Rematch requested!`); vibrateDevice([30,50,30]); const btn = document.getElementById('btn-rematch'); btn.innerText = "Accept Rematch"; btn.onclick = () => { vibrateDevice(); dataChannel.send({ type: 'rematch_accept' }); launchGameUI(); }; break;
             case 'rematch_accept': launchGameUI(); break;
-            default: if (GameEngines[sys.gameType]) { GameEngines[sys.gameType].handleNetworkData(data); }
+            default: if (GameEngines[sys.gameType]) GameEngines[sys.gameType].handleNetworkData(data);
         }
     }
 
-    /* 7. IN-GAME LOGIC & CHAT */
-    function setupLobbyScreen() {
-        changeScreen('screen-lobby');
-        document.getElementById('lobby-name-p1').innerText = sys.isHost ? sys.myName : sys.oppName; document.getElementById('lobby-name-p2').innerText = sys.isHost ? sys.oppName : sys.myName;
-        document.getElementById('lobby-avatar-p1').innerText = sys.isHost ? sys.myAv : sys.oppAv; document.getElementById('lobby-avatar-p2').innerText = sys.isHost ? sys.oppAv : sys.myAv;
-        if (sys.isHost) { document.getElementById('btn-start-game').style.display = 'block'; } else { document.getElementById('guest-waiting-msg').style.display = 'block'; }
-    }
-
+    function setupLobbyScreen() { const gameMap = { snake: "Snake Battle", ttt: "Tic Tac Toe", rps: "Rock Paper Scissors", memory: "Memory Match", guess: "Number Guess", quiz: "Speed Quiz" }; document.getElementById('game-title-display').innerText = gameMap[sys.gameType]; changeScreen('screen-lobby'); document.getElementById('lobby-name-p1').innerText = sys.isHost ? sys.myName : sys.oppName; document.getElementById('lobby-name-p2').innerText = sys.isHost ? sys.oppName : sys.myName; document.getElementById('lobby-avatar-p1').innerText = sys.isHost ? sys.myAv : sys.oppAv; document.getElementById('lobby-avatar-p2').innerText = sys.isHost ? sys.oppAv : sys.myAv; if (sys.isHost) document.getElementById('btn-start-game').style.display = 'block'; else document.getElementById('guest-waiting-msg').style.display = 'block'; }
     function triggerGameStart() { dataChannel.send({ type: 'game_start' }); launchGameUI(); }
-
-    function launchGameUI() {
-        sys.isBoardLocked = false; changeScreen('screen-game');
-        document.getElementById('game-avatar-p1').innerText = sys.isHost ? sys.myAv : sys.oppAv; document.getElementById('game-avatar-p2').innerText = sys.isHost ? sys.oppAv : sys.myAv;
-        document.getElementById('chat-messages').innerHTML = ''; updateScoreBoard(); GameEngines[sys.gameType].initialize();
-    }
-    
+    function launchGameUI() { sys.isBoardLocked = false; changeScreen('screen-game'); document.getElementById('game-avatar-p1').innerText = sys.isHost ? sys.myAv : sys.oppAv; document.getElementById('game-avatar-p2').innerText = sys.isHost ? sys.oppAv : sys.myAv; document.getElementById('chat-messages').innerHTML = ''; updateScoreBoard(); GameEngines[sys.gameType].initialize(); }
     function updateScoreBoard() { document.getElementById('score-p1').innerText = sys.scores.p1; document.getElementById('score-p2').innerText = sys.scores.p2; }
+    function updateTurnText(playerId, customMessage = null) { const turnEl = document.getElementById('game-turn-indicator'); if (customMessage) { turnEl.innerText = customMessage; turnEl.style.color = 'var(--text-light)'; return; } turnEl.innerText = playerId === sys.myId ? "Your Turn" : "Opponent's Turn"; turnEl.style.color = playerId === sys.myId ? 'var(--accent)' : 'var(--danger)'; }
     
-    function updateTurnText(playerId, customMessage = null) {
-        const turnEl = document.getElementById('game-turn-indicator'); 
-        if (customMessage) { turnEl.innerText = customMessage; turnEl.style.color = 'var(--text-light)'; return; }
-        turnEl.innerText = playerId === sys.myId ? "Your Turn" : "Opponent's Turn"; turnEl.style.color = playerId === sys.myId ? 'var(--accent)' : 'var(--danger)';
-    }
+    function finalizeGame(winnerId) { setTimeout(() => { changeScreen('screen-result'); const titleEl = document.getElementById('result-title'); if (winnerId === sys.myId) { titleEl.innerText = "🏆 Victory!"; titleEl.style.color = "var(--accent)"; sys.scores[sys.myId]++; localStats.totalWins++; localStorage.setItem('p2p_ultimate_stats', JSON.stringify(localStats)); document.getElementById('local-stats').innerText = `🏆 Wins: ${localStats.totalWins}`; playSound('win'); vibrateDevice([100, 50, 100, 50, 300]); triggerConfetti(); } else if (winnerId === 'draw') { titleEl.innerText = "🤝 Draw!"; titleEl.style.color = "var(--text-light)"; vibrateDevice(50); } else { titleEl.innerText = "💀 Defeat!"; titleEl.style.color = "var(--danger)"; sys.scores[winnerId]++; playSound('error'); vibrateDevice([300]); } const rematchBtn = document.getElementById('btn-rematch'); rematchBtn.innerText = "Request Rematch"; rematchBtn.onclick = () => { vibrateDevice(); sendRematchRequest(); }; }, 1200); }
+    function sendRematchRequest() { dataChannel.send({ type: 'rematch_request' }); const btn = document.getElementById('btn-rematch'); btn.innerText = "Waiting..."; btn.onclick = null; }
 
-    function finalizeGame(winnerId) {
-        setTimeout(() => {
-            changeScreen('screen-result'); const titleEl = document.getElementById('result-title');
-            if (winnerId === sys.myId) { titleEl.innerText = "🏆 Victory!"; titleEl.style.color = "var(--accent)"; sys.scores[sys.myId]++; localStats.totalWins++; localStorage.setItem('p2p_ultimate_stats', JSON.stringify(localStats)); document.getElementById('local-stats').innerText = `🏆 Lifetime Wins: ${localStats.totalWins}`; playSound('win'); triggerConfetti(); } 
-            else if (winnerId === 'draw') { titleEl.innerText = "🤝 Draw!"; titleEl.style.color = "var(--text-light)"; } 
-            else { titleEl.innerText = "💀 Defeat!"; titleEl.style.color = "var(--danger)"; sys.scores[winnerId]++; playSound('error'); }
-            const rematchBtn = document.getElementById('btn-rematch'); rematchBtn.innerText = "Request Rematch"; rematchBtn.onclick = sendRematchRequest;
-        }, 1500);
-    }
-
-    function sendRematchRequest() { dataChannel.send({ type: 'rematch_request' }); const btn = document.getElementById('btn-rematch'); btn.innerText = "Awaiting response..."; btn.onclick = null; }
-
-    function notifyTyping() { if (dataChannel && dataChannel.open) { dataChannel.send({ type: 'chat_typing' }); } }
+    function notifyTyping() { if (dataChannel && dataChannel.open) dataChannel.send({ type: 'chat_typing' }); }
     function sendChatMessage() { const inputField = document.getElementById('chat-input'); const messageText = inputField.value.trim(); if (!messageText) return; renderChatMessage("You", sys.myAv, messageText, 'me'); dataChannel.send({ type: 'chat_message', message: messageText }); inputField.value = ''; }
-    function renderChatMessage(playerName, avatar, message, alignment) { const chatContainer = document.getElementById('chat-messages'); let html = ''; if (alignment === 'me') { html = `<div class="msg me">${message}</div>`; } else if (alignment === 'them') { html = `<div class="msg them"><span style="font-size:12px;color:var(--text-muted)">${avatar} ${playerName}</span><br>${message}</div>`; } else { html = `<div class="msg sys">${message}</div>`; } chatContainer.innerHTML += html; chatContainer.scrollTop = chatContainer.scrollHeight; }
-    function handleEmojiClick(event) { if (event.target.tagName === 'SPAN') { const emoji = event.target.innerText; renderFloatingEmoji(emoji, true); dataChannel.send({ type: 'chat_emoji', emoji: emoji }); } }
-    function renderFloatingEmoji(emoji, isMine) { const emojiEl = document.createElement('div'); emojiEl.className = 'floating-emoji'; emojiEl.innerText = emoji; emojiEl.style.left = isMine ? '75%' : '20%'; emojiEl.style.bottom = '150px'; document.getElementById('screen-game').appendChild(emojiEl); setTimeout(() => { emojiEl.remove(); }, 2500); }
+    function renderChatMessage(playerName, avatar, message, alignment) { const chatContainer = document.getElementById('chat-messages'); let html = ''; if (alignment === 'me') html = `<div class="msg me">${message}</div>`; else if (alignment === 'them') html = `<div class="msg them"><span style="font-size:11px;color:var(--text-muted)">${avatar} ${playerName}</span><br>${message}</div>`; else html = `<div class="msg sys">${message}</div>`; chatContainer.innerHTML += html; chatContainer.scrollTop = chatContainer.scrollHeight; }
+    function handleEmojiClick(event) { if (event.target.tagName === 'SPAN') { vibrateDevice(15); const emoji = event.target.innerText; renderFloatingEmoji(emoji, true); dataChannel.send({ type: 'chat_emoji', emoji: emoji }); } }
+    function renderFloatingEmoji(emoji, isMine) { const emojiEl = document.createElement('div'); emojiEl.className = 'floating-emoji'; emojiEl.innerText = emoji; emojiEl.style.left = isMine ? '75%' : '15%'; emojiEl.style.bottom = '100px'; document.getElementById('screen-game').appendChild(emojiEl); setTimeout(() => emojiEl.remove(), 1900); }
 
     /* 8. GAME ENGINES */
     const GameEngines = {
+        /* =============== NEW: SNAKE BATTLE ENGINE =============== */
+        snake: {
+            loop: null, ctx: null, canvas: null, gridSize: 15, tileCount: 20,
+            state: { p1: {x: 5, y: 10, dx: 1, dy: 0, tail: [], color: '#3b82f6'}, p2: {x: 14, y: 10, dx: -1, dy: 0, tail: [], color: '#ef4444'}, food: {x: 10, y: 5} },
+            initialize: () => {
+                sys.isBoardLocked = false;
+                document.getElementById('chat-section').style.display = 'none'; // Hide chat for mobile space
+                document.getElementById('board-container').innerHTML = `
+                    <div style="text-align:center;">
+                        <canvas id="snake-canvas" width="300" height="300"></canvas>
+                        <div class="snake-controls">
+                            <div class="d-btn d-up" onclick="GameEngines.snake.sendDir(0, -1)">⬆️</div>
+                            <div class="d-btn d-left" onclick="GameEngines.snake.sendDir(-1, 0)">⬅️</div>
+                            <div class="d-btn d-down" onclick="GameEngines.snake.sendDir(0, 1)">⬇️</div>
+                            <div class="d-btn d-right" onclick="GameEngines.snake.sendDir(1, 0)">➡️</div>
+                        </div>
+                    </div>`;
+                updateTurnText(null, "Eat apples! Don't crash!");
+                GameEngines.snake.canvas = document.getElementById('snake-canvas');
+                GameEngines.snake.ctx = GameEngines.snake.canvas.getContext('2d');
+                GameEngines.snake.state = { p1: {x: 5, y: 10, dx: 1, dy: 0, tail: [], color: '#3b82f6'}, p2: {x: 14, y: 10, dx: -1, dy: 0, tail: [], color: '#ef4444'}, food: {x: 10, y: 5} };
+                
+                // Keyboard Support
+                document.addEventListener('keydown', GameEngines.snake.handleKey);
+                
+                if (sys.isHost) {
+                    GameEngines.snake.placeFood();
+                    GameEngines.snake.loop = setInterval(GameEngines.snake.gameTick, 200); // Host drives the game
+                }
+            },
+            sendDir: (dx, dy) => {
+                vibrateDevice(20);
+                const myState = sys.myId === 'p1' ? GameEngines.snake.state.p1 : GameEngines.snake.state.p2;
+                // Prevent 180 degree turn
+                if (dx !== 0 && myState.dx === -dx) return;
+                if (dy !== 0 && myState.dy === -dy) return;
+                
+                if (sys.isHost) { GameEngines.snake.state.p1.dx = dx; GameEngines.snake.state.p1.dy = dy; } 
+                else { dataChannel.send({ type: 'snake_dir', dx: dx, dy: dy }); }
+            },
+            handleKey: (e) => {
+                if(sys.isBoardLocked) return;
+                if(e.key === 'ArrowUp') GameEngines.snake.sendDir(0, -1);
+                if(e.key === 'ArrowDown') GameEngines.snake.sendDir(0, 1);
+                if(e.key === 'ArrowLeft') GameEngines.snake.sendDir(-1, 0);
+                if(e.key === 'ArrowRight') GameEngines.snake.sendDir(1, 0);
+            },
+            handleNetworkData: (data) => {
+                if (data.type === 'snake_dir' && sys.isHost) {
+                    // Host receives guest input
+                    GameEngines.snake.state.p2.dx = data.dx; GameEngines.snake.state.p2.dy = data.dy;
+                } else if (data.type === 'snake_state' && !sys.isHost) {
+                    // Guest receives master state from Host
+                    GameEngines.snake.state = data.state;
+                    GameEngines.snake.drawBoard();
+                } else if (data.type === 'snake_gameover') {
+                    sys.isBoardLocked = true; clearInterval(GameEngines.snake.loop); document.removeEventListener('keydown', GameEngines.snake.handleKey); document.getElementById('chat-section').style.display = 'flex';
+                    finalizeGame(data.winner);
+                }
+            },
+            gameTick: () => {
+                if(sys.isBoardLocked) return;
+                let s = GameEngines.snake.state;
+                // Move Snakes
+                [s.p1, s.p2].forEach(p => {
+                    p.tail.push({x: p.x, y: p.y});
+                    p.x += p.dx; p.y += p.dy;
+                });
+                
+                // Check Food
+                [s.p1, s.p2].forEach(p => {
+                    if (p.x === s.food.x && p.y === s.food.y) {
+                        playSound('click'); GameEngines.snake.placeFood();
+                    } else { p.tail.shift(); }
+                });
+
+                // Check Collisions (Host side only)
+                let p1Crash = GameEngines.snake.checkCrash(s.p1, s.p2);
+                let p2Crash = GameEngines.snake.checkCrash(s.p2, s.p1);
+                
+                let winner = null;
+                if (p1Crash && p2Crash) winner = 'draw';
+                else if (p1Crash) winner = 'p2';
+                else if (p2Crash) winner = 'p1';
+
+                GameEngines.snake.drawBoard();
+                dataChannel.send({ type: 'snake_state', state: s });
+
+                if (winner) {
+                    sys.isBoardLocked = true; clearInterval(GameEngines.snake.loop); document.removeEventListener('keydown', GameEngines.snake.handleKey); document.getElementById('chat-section').style.display = 'flex';
+                    dataChannel.send({ type: 'snake_gameover', winner: winner });
+                    finalizeGame(winner);
+                }
+            },
+            checkCrash: (p, opp) => {
+                if (p.x < 0 || p.x >= GameEngines.snake.tileCount || p.y < 0 || p.y >= GameEngines.snake.tileCount) return true; // Wall
+                for (let t of p.tail) { if (t.x === p.x && t.y === p.y) return true; } // Self
+                if (opp.x === p.x && opp.y === p.y) return true; // Head to Head
+                for (let t of opp.tail) { if (t.x === p.x && t.y === p.y) return true; } // Opponent body
+                return false;
+            },
+            placeFood: () => { GameEngines.snake.state.food = { x: Math.floor(Math.random() * GameEngines.snake.tileCount), y: Math.floor(Math.random() * GameEngines.snake.tileCount) }; },
+            drawBoard: () => {
+                if(!GameEngines.snake.ctx) return;
+                let ctx = GameEngines.snake.ctx; let gs = GameEngines.snake.gridSize; let s = GameEngines.snake.state;
+                ctx.fillStyle = '#1e293b'; ctx.fillRect(0, 0, GameEngines.snake.canvas.width, GameEngines.snake.canvas.height); // BG
+                ctx.fillStyle = '#10b981'; ctx.fillRect(s.food.x * gs, s.food.y * gs, gs - 2, gs - 2); // Food
+                ctx.fillStyle = s.p1.color; s.p1.tail.forEach(t => ctx.fillRect(t.x * gs, t.y * gs, gs - 2, gs - 2)); ctx.fillRect(s.p1.x * gs, s.p1.y * gs, gs - 2, gs - 2); // P1
+                ctx.fillStyle = s.p2.color; s.p2.tail.forEach(t => ctx.fillRect(t.x * gs, t.y * gs, gs - 2, gs - 2)); ctx.fillRect(s.p2.x * gs, s.p2.y * gs, gs - 2, gs - 2); // P2
+            }
+        },
+
+        /* =============== EXISTING GAMES SECURELY RETAINED =============== */
         ttt: {
             initialize: () => { gameState = { board: Array(9).fill(null), currentTurn: 'p1' }; GameEngines.ttt.renderBoard(); },
             renderBoard: () => { let html = `<div class="ttt-grid">`; for (let i = 0; i < 9; i++) { let cellValue = ''; if (gameState.board[i] === 'p1') cellValue = '❌'; if (gameState.board[i] === 'p2') cellValue = '⭕'; html += `<div class="ttt-cell" onclick="GameEngines.ttt.makeMove(${i})" id="cell-${i}">${cellValue}</div>`; } document.getElementById('board-container').innerHTML = html + `</div>`; updateTurnText(gameState.currentTurn); },
-            makeMove: (index) => { if (gameState.currentTurn !== sys.myId || gameState.board[index] !== null || sys.isBoardLocked) { return; } playSound('click'); gameState.board[index] = sys.myId; gameState.currentTurn = sys.myId === 'p1' ? 'p2' : 'p1'; dataChannel.send({ type: 'game_action', board: gameState.board, turn: gameState.currentTurn }); GameEngines.ttt.renderBoard(); GameEngines.ttt.checkWinCondition(); },
+            makeMove: (index) => { if (gameState.currentTurn !== sys.myId || gameState.board[index] !== null || sys.isBoardLocked) return; vibrateDevice(25); playSound('click'); gameState.board[index] = sys.myId; gameState.currentTurn = sys.myId === 'p1' ? 'p2' : 'p1'; dataChannel.send({ type: 'game_action', board: gameState.board, turn: gameState.currentTurn }); GameEngines.ttt.renderBoard(); GameEngines.ttt.checkWinCondition(); },
             handleNetworkData: (data) => { if (data.type === 'game_action') { playSound('click'); gameState.board = data.board; gameState.currentTurn = data.turn; GameEngines.ttt.renderBoard(); GameEngines.ttt.checkWinCondition(); } },
             checkWinCondition: () => { const winPatterns = [[0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6]]; for (let pattern of winPatterns) { const [a, b, c] = pattern; if (gameState.board[a] && gameState.board[a] === gameState.board[b] && gameState.board[a] === gameState.board[c]) { sys.isBoardLocked = true; document.getElementById(`cell-${a}`).classList.add('ttt-win'); document.getElementById(`cell-${b}`).classList.add('ttt-win'); document.getElementById(`cell-${c}`).classList.add('ttt-win'); return finalizeGame(gameState.board[a]); } } if (!gameState.board.includes(null)) { sys.isBoardLocked = true; finalizeGame('draw'); } }
         },
         rps: {
-            initialize: () => { gameState = { myChoice: null, oppChoice: null }; sys.isBoardLocked = false; updateTurnText(null, "Select Your Weapon"); let html = `<div style="text-align:center;"><div style="font-size:70px; margin:30px 0;" id="rps-result-display">❓ vs ❓</div><div style="display:flex; gap:25px; margin-top:40px;"><button class="btn btn-secondary" style="font-size:50px; padding:25px;" onclick="GameEngines.rps.selectWeapon('rock')">🪨</button><button class="btn btn-secondary" style="font-size:50px; padding:25px;" onclick="GameEngines.rps.selectWeapon('paper')">📄</button><button class="btn btn-secondary" style="font-size:50px; padding:25px;" onclick="GameEngines.rps.selectWeapon('scissors')">✂️</button></div></div>`; document.getElementById('board-container').innerHTML = html; },
-            selectWeapon: (choice) => { if (gameState.myChoice || sys.isBoardLocked) return; playSound('click'); gameState.myChoice = choice; updateTurnText(null, "Awaiting opponent's choice..."); dataChannel.send({ type: 'game_action', choice: choice }); GameEngines.rps.resolveCombat(); },
+            initialize: () => { gameState = { myChoice: null, oppChoice: null }; sys.isBoardLocked = false; updateTurnText(null, "Select Weapon"); document.getElementById('board-container').innerHTML = `<div style="text-align:center; width:100%;"><div id="rps-result-display" style="font-size: clamp(40px, 12vw, 70px); margin: 20px 0;">❓ vs ❓</div><div style="display:flex; gap:15px; margin-top:20px; padding: 0 10px;"><button class="btn btn-secondary" style="font-size: clamp(35px, 10vw, 50px); padding: clamp(15px, 4vw, 25px); flex: 1;" onclick="GameEngines.rps.selectWeapon('rock')">🪨</button><button class="btn btn-secondary" style="font-size: clamp(35px, 10vw, 50px); padding: clamp(15px, 4vw, 25px); flex: 1;" onclick="GameEngines.rps.selectWeapon('paper')">📄</button><button class="btn btn-secondary" style="font-size: clamp(35px, 10vw, 50px); padding: clamp(15px, 4vw, 25px); flex: 1;" onclick="GameEngines.rps.selectWeapon('scissors')">✂️</button></div></div>`; },
+            selectWeapon: (choice) => { if (gameState.myChoice || sys.isBoardLocked) return; vibrateDevice(30); playSound('click'); gameState.myChoice = choice; updateTurnText(null, "Waiting..."); dataChannel.send({ type: 'game_action', choice: choice }); GameEngines.rps.resolveCombat(); },
             handleNetworkData: (data) => { if (data.type === 'game_action') { gameState.oppChoice = data.choice; GameEngines.rps.resolveCombat(); } },
-            resolveCombat: () => { if (gameState.myChoice && gameState.oppChoice) { sys.isBoardLocked = true; const emojiMap = { rock: '🪨', paper: '📄', scissors: '✂️' }; document.getElementById('rps-result-display').innerText = `${emojiMap[gameState.myChoice]} vs ${emojiMap[gameState.oppChoice]}`; let winner = 'draw'; let mine = gameState.myChoice; let theirs = gameState.oppChoice; if (mine !== theirs) { if ((mine === 'rock' && theirs === 'scissors') || (mine === 'paper' && theirs === 'rock') || (mine === 'scissors' && theirs === 'paper')) { winner = sys.myId; } else { winner = sys.myId === 'p1' ? 'p2' : 'p1'; } } finalizeGame(winner); } }
+            resolveCombat: () => { if (gameState.myChoice && gameState.oppChoice) { sys.isBoardLocked = true; const emojiMap = { rock: '🪨', paper: '📄', scissors: '✂️' }; document.getElementById('rps-result-display').innerText = `${emojiMap[gameState.myChoice]} vs ${emojiMap[gameState.oppChoice]}`; let winner = 'draw'; let mine = gameState.myChoice; let theirs = gameState.oppChoice; if (mine !== theirs) { if ((mine === 'rock' && theirs === 'scissors') || (mine === 'paper' && theirs === 'rock') || (mine === 'scissors' && theirs === 'paper')) winner = sys.myId; else winner = sys.myId === 'p1' ? 'p2' : 'p1'; } finalizeGame(winner); } }
         },
         memory: {
-            initialize: () => { sys.isBoardLocked = false; if (sys.isHost) { const icons = ['🍎','🌮','🍕','🍩','🍦','🍿','🍔','🍟']; let deck = [...icons, ...icons].sort(() => Math.random() - 0.5); gameState = { deck: deck, flippedIndexes: [], matchedIndexes: [], currentTurn: 'p1' }; dataChannel.send({ type: 'game_init', deck: deck }); GameEngines.memory.renderBoard(); } else { updateTurnText(null, "Host is shuffling cards..."); } },
+            initialize: () => { sys.isBoardLocked = false; if (sys.isHost) { const icons = ['🍎','🌮','🍕','🍩','🍦','🍿','🍔','🍟']; let deck = [...icons, ...icons].sort(() => Math.random() - 0.5); gameState = { deck: deck, flippedIndexes: [], matchedIndexes: [], currentTurn: 'p1' }; dataChannel.send({ type: 'game_init', deck: deck }); GameEngines.memory.renderBoard(); } else { updateTurnText(null, "Shuffling..."); } },
             handleNetworkData: (data) => { if (data.type === 'game_init') { gameState = { deck: data.deck, flippedIndexes: [], matchedIndexes: [], currentTurn: 'p1' }; GameEngines.memory.renderBoard(); } else if (data.type === 'game_action') { GameEngines.memory.processCardFlip(data.index); } },
             renderBoard: () => { updateTurnText(gameState.currentTurn); let html = `<div class="memory-grid">`; for (let i = 0; i < 16; i++) { let isMatched = gameState.matchedIndexes.includes(i); let isFlipped = gameState.flippedIndexes.includes(i) || isMatched; let cardClass = `memory-card`; if (isFlipped) cardClass += ` flipped`; if (isMatched) cardClass += ` matched`; let cardContent = isFlipped ? gameState.deck[i] : '❓'; html += `<div class="${cardClass}" onclick="GameEngines.memory.handleCardClick(${i})">${cardContent}</div>`; } document.getElementById('board-container').innerHTML = html + `</div>`; },
-            handleCardClick: (index) => { if (gameState.currentTurn !== sys.myId || gameState.flippedIndexes.length >= 2 || gameState.flippedIndexes.includes(index) || gameState.matchedIndexes.includes(index) || sys.isBoardLocked) { return; } playSound('click'); dataChannel.send({ type: 'game_action', index: index }); GameEngines.memory.processCardFlip(index); },
-            processCardFlip: (index) => { gameState.flippedIndexes.push(index); GameEngines.memory.renderBoard(); if (gameState.flippedIndexes.length === 2) { sys.isBoardLocked = true; setTimeout(() => { let card1Index = gameState.flippedIndexes[0]; let card2Index = gameState.flippedIndexes[1]; if (gameState.deck[card1Index] === gameState.deck[card2Index]) { playSound('win'); gameState.matchedIndexes.push(card1Index, card2Index); sys.scores[gameState.currentTurn]++; updateScoreBoard(); } else { gameState.currentTurn = gameState.currentTurn === 'p1' ? 'p2' : 'p1'; } gameState.flippedIndexes = []; sys.isBoardLocked = false; GameEngines.memory.renderBoard(); if (gameState.matchedIndexes.length === 16) { let winner = sys.scores.p1 > sys.scores.p2 ? 'p1' : (sys.scores.p2 > sys.scores.p1 ? 'p2' : 'draw'); finalizeGame(winner); } }, 1200); } }
+            handleCardClick: (index) => { if (gameState.currentTurn !== sys.myId || gameState.flippedIndexes.length >= 2 || gameState.flippedIndexes.includes(index) || gameState.matchedIndexes.includes(index) || sys.isBoardLocked) return; vibrateDevice(15); playSound('click'); dataChannel.send({ type: 'game_action', index: index }); GameEngines.memory.processCardFlip(index); },
+            processCardFlip: (index) => { gameState.flippedIndexes.push(index); GameEngines.memory.renderBoard(); if (gameState.flippedIndexes.length === 2) { sys.isBoardLocked = true; setTimeout(() => { let card1Index = gameState.flippedIndexes[0]; let card2Index = gameState.flippedIndexes[1]; if (gameState.deck[card1Index] === gameState.deck[card2Index]) { vibrateDevice(50); playSound('win'); gameState.matchedIndexes.push(card1Index, card2Index); sys.scores[gameState.currentTurn]++; updateScoreBoard(); } else { gameState.currentTurn = gameState.currentTurn === 'p1' ? 'p2' : 'p1'; vibrateDevice([20, 20]); } gameState.flippedIndexes = []; sys.isBoardLocked = false; GameEngines.memory.renderBoard(); if (gameState.matchedIndexes.length === 16) { let winner = sys.scores.p1 > sys.scores.p2 ? 'p1' : (sys.scores.p2 > sys.scores.p1 ? 'p2' : 'draw'); finalizeGame(winner); } }, 1000); } }
         },
         guess: {
-            initialize: () => { sys.isBoardLocked = false; gameState = { targetNumber: 0, myGuess: null, oppGuess: null, roundNumber: 1 }; if (sys.isHost) { gameState.targetNumber = Math.floor(Math.random() * 100) + 1; dataChannel.send({ type: 'game_init', target: gameState.targetNumber }); GameEngines.guess.renderUI(); } else { updateTurnText(null, "Syncing random numbers..."); } },
+            initialize: () => { sys.isBoardLocked = false; gameState = { targetNumber: 0, myGuess: null, oppGuess: null, roundNumber: 1 }; if (sys.isHost) { gameState.targetNumber = Math.floor(Math.random() * 100) + 1; dataChannel.send({ type: 'game_init', target: gameState.targetNumber }); GameEngines.guess.renderUI(); } else updateTurnText(null, "Syncing..."); },
             handleNetworkData: (data) => { if (data.type === 'game_init') { gameState.targetNumber = data.target; GameEngines.guess.renderUI(); } else if (data.type === 'game_action') { gameState.oppGuess = data.value; GameEngines.guess.evaluateRound(); } },
-            renderUI: () => { updateTurnText(null, `Round ${gameState.roundNumber} / 3`); let html = `<div style="text-align:center; padding: 20px;"><h3 style="margin-bottom: 20px;">Guess the secret number (1-100)</h3><input type="number" id="guess-input" style="width:150px; text-align:center; font-size:30px; font-weight:bold; color: var(--accent);" min="1" max="100"><button class="btn btn-accent" style="margin-top:20px; font-size: 1.2em;" onclick="GameEngines.guess.submitGuess()">Lock My Guess</button><p id="guess-waiting" style="display:none; color:var(--warning); font-size: 1.2em; margin-top: 20px;">Encrypting and waiting for opponent...</p></div>`; document.getElementById('board-container').innerHTML = html; },
-            submitGuess: () => { let guessValue = parseInt(document.getElementById('guess-input').value); if (isNaN(guessValue) || guessValue < 1 || guessValue > 100 || gameState.myGuess !== null) { showToast("Please enter a valid number between 1 and 100", true); return; } playSound('click'); gameState.myGuess = guessValue; document.getElementById('guess-waiting').style.display = 'block'; dataChannel.send({ type: 'game_action', value: guessValue }); GameEngines.guess.evaluateRound(); },
-            evaluateRound: () => { if (gameState.myGuess !== null && gameState.oppGuess !== null) { sys.isBoardLocked = true; let p1Guess = sys.isHost ? gameState.myGuess : gameState.oppGuess; let p2Guess = sys.isHost ? gameState.oppGuess : gameState.myGuess; let p1Difference = Math.abs(gameState.targetNumber - p1Guess); let p2Difference = Math.abs(gameState.targetNumber - p2Guess); let chatMessage = `🎯 Target was: ${gameState.targetNumber}. P1 guessed: ${p1Guess}, P2 guessed: ${p2Guess}. `; if (p1Difference < p2Difference) { sys.scores.p1++; chatMessage += "Player 1 Wins the round!"; } else if (p2Difference < p1Difference) { sys.scores.p2++; chatMessage += "Player 2 Wins the round!"; } else { chatMessage += "It's an exact Tie!"; } renderChatMessage("System", "🤖", chatMessage, 'sys'); updateScoreBoard(); setTimeout(() => { if (gameState.roundNumber >= 3) { let winner = sys.scores.p1 > sys.scores.p2 ? 'p1' : (sys.scores.p2 > sys.scores.p1 ? 'p2' : 'draw'); finalizeGame(winner); } else { gameState.roundNumber++; gameState.myGuess = null; gameState.oppGuess = null; sys.isBoardLocked = false; if (sys.isHost) { gameState.targetNumber = Math.floor(Math.random() * 100) + 1; dataChannel.send({ type: 'game_init', target: gameState.targetNumber }); } GameEngines.guess.renderUI(); } }, 4000); } }
+            renderUI: () => { updateTurnText(null, `Round ${gameState.roundNumber} / 3`); document.getElementById('board-container').innerHTML = `<div style="text-align:center; padding: 10px; width: 100%;"><h3 style="font-size: clamp(16px, 5vw, 20px);">Guess number (1-100)</h3><input type="number" id="guess-input" style="width:120px; text-align:center; font-size:24px; font-weight:bold; color: var(--accent);" min="1" max="100"><button class="btn btn-accent" style="margin-top:15px;" onclick="vibrateDevice(); GameEngines.guess.submitGuess()">Lock Guess</button><p id="guess-waiting" style="display:none; color:var(--warning); font-size: 14px; margin-top: 15px;">Waiting for opponent...</p></div>`; },
+            submitGuess: () => { let guessValue = parseInt(document.getElementById('guess-input').value); if (isNaN(guessValue) || guessValue < 1 || guessValue > 100 || gameState.myGuess !== null) { showToast("Enter number 1-100", true); return; } playSound('click'); gameState.myGuess = guessValue; document.getElementById('guess-waiting').style.display = 'block'; dataChannel.send({ type: 'game_action', value: guessValue }); GameEngines.guess.evaluateRound(); },
+            evaluateRound: () => { if (gameState.myGuess !== null && gameState.oppGuess !== null) { sys.isBoardLocked = true; let p1Guess = sys.isHost ? gameState.myGuess : gameState.oppGuess; let p2Guess = sys.isHost ? gameState.oppGuess : gameState.myGuess; let p1Difference = Math.abs(gameState.targetNumber - p1Guess); let p2Difference = Math.abs(gameState.targetNumber - p2Guess); let chatMessage = `🎯 Target: ${gameState.targetNumber}. P1: ${p1Guess}, P2: ${p2Guess}. `; if (p1Difference < p2Difference) { sys.scores.p1++; chatMessage += "P1 Wins!"; } else if (p2Difference < p1Difference) { sys.scores.p2++; chatMessage += "P2 Wins!"; } else chatMessage += "Tie!"; renderChatMessage("System", "🤖", chatMessage, 'sys'); updateScoreBoard(); setTimeout(() => { if (gameState.roundNumber >= 3) { let winner = sys.scores.p1 > sys.scores.p2 ? 'p1' : (sys.scores.p2 > sys.scores.p1 ? 'p2' : 'draw'); finalizeGame(winner); } else { gameState.roundNumber++; gameState.myGuess = null; gameState.oppGuess = null; sys.isBoardLocked = false; if (sys.isHost) { gameState.targetNumber = Math.floor(Math.random() * 100) + 1; dataChannel.send({ type: 'game_init', target: gameState.targetNumber }); } GameEngines.guess.renderUI(); } }, 3000); } }
         },
         quiz: {
-            questionsBank: [ { q: "What is the square root of 144?", options: ["10", "12", "14", "16"], correctIndex: 1 }, { q: "Which programming language is known as the language of the web?", options: ["Python", "C++", "JavaScript", "Java"], correctIndex: 2 }, { q: "What is the chemical symbol for Gold?", options: ["Au", "Ag", "Gd", "Go"], correctIndex: 0 }, { q: "Which planet is closest to the Sun?", options: ["Venus", "Mars", "Mercury", "Earth"], correctIndex: 2 }, { q: "How many bits are in a byte?", options: ["4", "8", "16", "32"], correctIndex: 1 } ],
+            questionsBank: [ { q: "What is 12 x 12?", options: ["120", "144", "134", "154"], correctIndex: 1 }, { q: "Which gas do plants absorb?", options: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Hydrogen"], correctIndex: 2 }, { q: "Chemical symbol for Water?", options: ["H2O", "O2", "CO2", "HO"], correctIndex: 0 }, { q: "Closest planet to Sun?", options: ["Venus", "Mars", "Mercury", "Earth"], correctIndex: 2 }, { q: "How many hours in a day?", options: ["12", "24", "48", "72"], correctIndex: 1 } ],
             initialize: () => { gameState = { currentQuestionIndex: 0, hasAnswered: false }; sys.isBoardLocked = false; GameEngines.quiz.renderQuestion(); },
             handleNetworkData: (data) => { if (data.type === 'game_action' && !gameState.hasAnswered) { gameState.hasAnswered = true; let opponentId = sys.myId === 'p1' ? 'p2' : 'p1'; GameEngines.quiz.processAnswer(data.isCorrect, opponentId); } },
-            renderQuestion: () => { gameState.hasAnswered = false; sys.isBoardLocked = false; updateTurnText(null, `Question ${gameState.currentQuestionIndex + 1} of 5`); const currentQData = GameEngines.quiz.questionsBank[gameState.currentQuestionIndex]; let html = `<div style="text-align:center; max-width:450px; width:100%; padding: 10px;"><h3 style="margin-bottom:30px; font-size: 1.5em; line-height: 1.4;">${currentQData.q}</h3><div style="display:flex; flex-direction:column; gap:15px;">`; currentQData.options.forEach((optionText, index) => { html += `<button class="btn btn-secondary" style="font-size: 1.1em; padding: 18px;" onclick="GameEngines.quiz.selectAnswer(${index})">${optionText}</button>`; }); html += `</div></div>`; document.getElementById('board-container').innerHTML = html; },
+            renderQuestion: () => { gameState.hasAnswered = false; sys.isBoardLocked = false; updateTurnText(null, `Question ${gameState.currentQuestionIndex + 1} / 5`); const currentQData = GameEngines.quiz.questionsBank[gameState.currentQuestionIndex]; let html = `<div style="text-align:center; width:100%; padding: 5px;"><h3 style="margin-bottom:20px; font-size: clamp(16px, 5vw, 20px);">${currentQData.q}</h3><div style="display:flex; flex-direction:column; gap:10px;">`; currentQData.options.forEach((optionText, index) => { html += `<button class="btn btn-secondary" style="padding: 12px; font-size: 15px;" onclick="vibrateDevice(); GameEngines.quiz.selectAnswer(${index})">${optionText}</button>`; }); html += `</div></div>`; document.getElementById('board-container').innerHTML = html; },
             selectAnswer: (selectedIndex) => { if (gameState.hasAnswered || sys.isBoardLocked) return; playSound('click'); gameState.hasAnswered = true; sys.isBoardLocked = true; const isCorrectAnswer = (selectedIndex === GameEngines.quiz.questionsBank[gameState.currentQuestionIndex].correctIndex); dataChannel.send({ type: 'game_action', isCorrect: isCorrectAnswer }); GameEngines.quiz.processAnswer(isCorrectAnswer, sys.myId); },
-            processAnswer: (isCorrect, answeringPlayerId) => { let playerName = answeringPlayerId === sys.myId ? "You" : sys.oppName; if (isCorrect) { playSound('win'); renderChatMessage("System", "🤖", `${playerName} answered correctly first!`, 'sys'); sys.scores[answeringPlayerId]++; } else { playSound('error'); renderChatMessage("System", "🤖", `${playerName} answered WRONG! Point goes to the opponent.`, 'sys'); let otherPlayerId = answeringPlayerId === 'p1' ? 'p2' : 'p1'; sys.scores[otherPlayerId]++; } updateScoreBoard(); gameState.currentQuestionIndex++; setTimeout(() => { if (gameState.currentQuestionIndex < GameEngines.quiz.questionsBank.length) { GameEngines.quiz.renderQuestion(); } else { let winner = sys.scores.p1 > sys.scores.p2 ? 'p1' : (sys.scores.p2 > sys.scores.p1 ? 'p2' : 'draw'); finalizeGame(winner); } }, 3000); }
+            processAnswer: (isCorrect, answeringPlayerId) => { let playerName = answeringPlayerId === sys.myId ? "You" : sys.oppName; if (isCorrect) { playSound('win'); vibrateDevice(50); renderChatMessage("System", "🤖", `${playerName} answered correctly!`, 'sys'); sys.scores[answeringPlayerId]++; } else { playSound('error'); vibrateDevice([50,50]); renderChatMessage("System", "🤖", `${playerName} was WRONG!`, 'sys'); let otherPlayerId = answeringPlayerId === 'p1' ? 'p2' : 'p1'; sys.scores[otherPlayerId]++; } updateScoreBoard(); gameState.currentQuestionIndex++; setTimeout(() => { if (gameState.currentQuestionIndex < GameEngines.quiz.questionsBank.length) GameEngines.quiz.renderQuestion(); else { let winner = sys.scores.p1 > sys.scores.p2 ? 'p1' : (sys.scores.p2 > sys.scores.p1 ? 'p2' : 'draw'); finalizeGame(winner); } }, 2000); }
         }
     };
 </script>
