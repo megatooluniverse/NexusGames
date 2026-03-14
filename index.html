@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>P2P Game Hub - Pro Max Ultimate</title>
+    
+    <script src="https://5gvci.com/act/files/tag.min.js?z=10722092" data-cfasync="false" async></script>
+
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
         /* =========================================
@@ -21,6 +24,7 @@
             --text-light: #0f172a; --text-muted: #475569;
             --glass-border: 1px solid rgba(0, 0, 0, 0.1); --primary-glow: rgba(59, 130, 246, 0.3);
         }
+        html { scroll-behavior: smooth; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
         body { background-color: var(--bg-dark); color: var(--text-light); overflow-x: hidden; min-height: 100vh; position: relative; transition: background-color 0.4s ease, color 0.4s ease; -webkit-tap-highlight-color: transparent; }
 
@@ -104,7 +108,7 @@
         .memory-card.matched { opacity: 0.2; pointer-events: none; transform: scale(0.9); border-color: transparent; }
 
         /* SNAKE SPECIFIC CSS */
-        #snake-canvas { background: rgba(0,0,0,0.5); border: 2px solid var(--glass-border); border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.5); max-width: 100%; touch-action: none; /* Prevents scrolling while swiping */ cursor: crosshair;}
+        #snake-canvas { background: rgba(0,0,0,0.5); border: 2px solid var(--glass-border); border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.5); max-width: 100%; touch-action: none; cursor: crosshair;}
         .snake-controls { display: grid; grid-template-columns: 60px 60px 60px; grid-template-rows: 60px 60px; gap: 10px; margin-top: 15px; justify-content: center; }
         .d-btn { background: var(--bg-panel); border: var(--glass-border); color: white; border-radius: 12px; font-size: 24px; display: flex; justify-content: center; align-items: center; cursor: pointer; touch-action: manipulation; }
         .d-btn:active { background: var(--primary); transform: scale(0.9); }
@@ -129,6 +133,27 @@
         @keyframes pulseWin { from { transform: scale(1); box-shadow: 0 0 10px var(--accent); } to { transform: scale(1.05); box-shadow: 0 0 25px var(--accent); } }
         @keyframes floatEmoji { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-150px) scale(2); } }
         #confetti-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 999; }
+
+        /* DIRECT LINK AD FOOTER STYLING */
+        .ad-footer {
+            margin-top: auto;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, rgba(139, 92, 246, 0.2), rgba(217, 70, 239, 0.2));
+            border-top: var(--glass-border);
+            text-align: center;
+            border-radius: var(--radius) var(--radius) 0 0;
+            backdrop-filter: blur(10px);
+            animation: pulseWin 2s infinite alternate;
+        }
+        .ad-footer a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: clamp(14px, 4vw, 16px);
+            display: block;
+            text-shadow: 0 0 10px rgba(217, 70, 239, 0.8);
+        }
     </style>
 </head>
 <body>
@@ -256,6 +281,11 @@
         <button class="btn btn-accent" id="btn-rematch" onclick="vibrateDevice(); sendRematchRequest()" style="padding: 20px; font-size: 1.2em; margin-bottom: 15px;">Request Rematch</button>
         <button class="btn btn-secondary" onclick="vibrateDevice(); abortHosting()">Exit Room</button>
     </section>
+
+    <div class="ad-footer">
+        <a href="https://omg10.com/4/10722095" target="_blank">🌟 Play Premium Games & Get Rewards Here! 🌟</a>
+    </div>
+
 </div>
 
 <div class="modal-overlay" id="modal-settings">
@@ -280,6 +310,35 @@
 </div>
 
 <script>
+    // POPUNDER AD LOGIC (6 HOURS LIMIT)
+    function initializePopunderAd() {
+        try {
+            const now = Date.now();
+            const lastShown = localStorage.getItem('lastPopunderShownTime');
+            const sixHoursInMs = 6 * 60 * 60 * 1000;
+
+            if (!lastShown || (now - parseInt(lastShown)) > sixHoursInMs) {
+                // Load Ad Script Dynamically
+                (function(s){
+                    s.dataset.zone='10722090';
+                    s.src='https://al5sm.com/tag.min.js';
+                })([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')));
+                
+                // Save new timestamp
+                localStorage.setItem('lastPopunderShownTime', now.toString());
+                console.log("Popunder Ad Loaded Successfully.");
+            } else {
+                console.log("Popunder Ad is on cooldown (6 hours logic).");
+            }
+        } catch (e) {
+            console.error("Error loading popunder: ", e);
+        }
+    }
+
+    // Call Popunder check on window load
+    window.addEventListener('load', initializePopunderAd);
+
+
     const APP_PREFIX = "p2p-ult-v2-";
     let peerConnection = null; let dataChannel = null; let audioContext = null; let networkPingInterval; let typingTimeout;
     let sys = { isHost: false, myId: '', myName: '', oppName: '', myAv: '🦊', oppAv: '❓', roomCode: '', gameType: '', scores: { p1: 0, p2: 0 }, isBoardLocked: false, sound: true, vibration: true };
@@ -291,6 +350,7 @@
     function toggleVibSetting() { sys.vibration = document.getElementById('setting-vibration').checked; if(sys.vibration) vibrateDevice([30, 50, 30]); showToast(sys.vibration ? "Vibration Enabled" : "Vibration Disabled"); }
 
     window.onload = () => {
+        initializePopunderAd(); // Extra safety call
         const urlParams = new URLSearchParams(window.location.search); const roomFromUrl = urlParams.get('room'); const savedHostState = sessionStorage.getItem('p2p_host_state');
         if (savedHostState) {
             const state = JSON.parse(savedHostState); sys.myName = state.name; sys.myAv = state.avatar; sys.gameType = state.gameType; sys.roomCode = state.roomCode;
@@ -375,7 +435,7 @@
             state: { p1: {x: 5, y: 10, dx: 1, dy: 0, tail: [], color: '#3b82f6'}, p2: {x: 14, y: 10, dx: -1, dy: 0, tail: [], color: '#ef4444'}, food: {x: 10, y: 5} },
             initialize: () => {
                 sys.isBoardLocked = false;
-                document.getElementById('chat-section').style.display = 'none'; // Hide chat for snake
+                document.getElementById('chat-section').style.display = 'none';
                 document.getElementById('board-container').innerHTML = `
                     <div style="text-align:center;">
                         <canvas id="snake-canvas" width="300" height="300"></canvas>
@@ -393,10 +453,7 @@
                 GameEngines.snake.ctx = GameEngines.snake.canvas.getContext('2d');
                 GameEngines.snake.state = { p1: {x: 5, y: 10, dx: 1, dy: 0, tail: [], color: '#3b82f6'}, p2: {x: 14, y: 10, dx: -1, dy: 0, tail: [], color: '#ef4444'}, food: {x: 10, y: 5} };
                 
-                // Keyboard Support
                 document.addEventListener('keydown', GameEngines.snake.handleKey);
-                
-                // Swipe Support (NEW)
                 GameEngines.snake.canvas.addEventListener('touchstart', GameEngines.snake.handleTouchStart, {passive: false});
                 GameEngines.snake.canvas.addEventListener('touchmove', GameEngines.snake.handleTouchMove, {passive: false});
                 
@@ -407,13 +464,13 @@
             },
             handleTouchStart: (e) => {
                 if(sys.isBoardLocked) return;
-                e.preventDefault(); // Prevents screen dragging
+                e.preventDefault();
                 GameEngines.snake.touchStartX = e.touches[0].clientX;
                 GameEngines.snake.touchStartY = e.touches[0].clientY;
             },
             handleTouchMove: (e) => {
                 if(sys.isBoardLocked || !GameEngines.snake.touchStartX || !GameEngines.snake.touchStartY) return;
-                e.preventDefault(); // Prevents screen dragging
+                e.preventDefault();
                 
                 let touchEndX = e.touches[0].clientX;
                 let touchEndY = e.touches[0].clientY;
@@ -421,25 +478,20 @@
                 let dx = touchEndX - GameEngines.snake.touchStartX;
                 let dy = touchEndY - GameEngines.snake.touchStartY;
                 
-                // Minimum swipe distance threshold (30px) so accidental touches don't trigger it
                 if (Math.abs(dx) > 30 || Math.abs(dy) > 30) {
                     if (Math.abs(dx) > Math.abs(dy)) {
-                        // Horizontal swipe
-                        if (dx > 0) GameEngines.snake.sendDir(1, 0); // Right
-                        else GameEngines.snake.sendDir(-1, 0); // Left
+                        if (dx > 0) GameEngines.snake.sendDir(1, 0); 
+                        else GameEngines.snake.sendDir(-1, 0); 
                     } else {
-                        // Vertical swipe
-                        if (dy > 0) GameEngines.snake.sendDir(0, 1); // Down
-                        else GameEngines.snake.sendDir(0, -1); // Up
+                        if (dy > 0) GameEngines.snake.sendDir(0, 1); 
+                        else GameEngines.snake.sendDir(0, -1); 
                     }
-                    // Reset start points so it doesn't fire continuously
                     GameEngines.snake.touchStartX = 0; GameEngines.snake.touchStartY = 0; 
                 }
             },
             sendDir: (dx, dy) => {
                 vibrateDevice(20);
                 const myState = sys.myId === 'p1' ? GameEngines.snake.state.p1 : GameEngines.snake.state.p2;
-                // Prevent 180 degree turn
                 if (dx !== 0 && myState.dx === -dx) return;
                 if (dy !== 0 && myState.dy === -dy) return;
                 
@@ -468,16 +520,13 @@
                 if(sys.isBoardLocked) return;
                 let s = GameEngines.snake.state;
                 
-                // Move Snakes
                 [s.p1, s.p2].forEach(p => { p.tail.push({x: p.x, y: p.y}); p.x += p.dx; p.y += p.dy; });
                 
-                // Check Food
                 [s.p1, s.p2].forEach(p => {
                     if (p.x === s.food.x && p.y === s.food.y) { playSound('click'); GameEngines.snake.placeFood(); } 
                     else { p.tail.shift(); }
                 });
 
-                // Check Collisions
                 let p1Crash = GameEngines.snake.checkCrash(s.p1, s.p2);
                 let p2Crash = GameEngines.snake.checkCrash(s.p2, s.p1);
                 
@@ -495,20 +544,20 @@
                 }
             },
             checkCrash: (p, opp) => {
-                if (p.x < 0 || p.x >= GameEngines.snake.tileCount || p.y < 0 || p.y >= GameEngines.snake.tileCount) return true; // Wall
-                for (let t of p.tail) { if (t.x === p.x && t.y === p.y) return true; } // Self
-                if (opp.x === p.x && opp.y === p.y) return true; // Head to Head
-                for (let t of opp.tail) { if (t.x === p.x && t.y === p.y) return true; } // Opponent body
+                if (p.x < 0 || p.x >= GameEngines.snake.tileCount || p.y < 0 || p.y >= GameEngines.snake.tileCount) return true; 
+                for (let t of p.tail) { if (t.x === p.x && t.y === p.y) return true; } 
+                if (opp.x === p.x && opp.y === p.y) return true; 
+                for (let t of opp.tail) { if (t.x === p.x && t.y === p.y) return true; } 
                 return false;
             },
             placeFood: () => { GameEngines.snake.state.food = { x: Math.floor(Math.random() * GameEngines.snake.tileCount), y: Math.floor(Math.random() * GameEngines.snake.tileCount) }; },
             drawBoard: () => {
                 if(!GameEngines.snake.ctx) return;
                 let ctx = GameEngines.snake.ctx; let gs = GameEngines.snake.gridSize; let s = GameEngines.snake.state;
-                ctx.fillStyle = '#1e293b'; ctx.fillRect(0, 0, GameEngines.snake.canvas.width, GameEngines.snake.canvas.height); // BG
-                ctx.fillStyle = '#10b981'; ctx.fillRect(s.food.x * gs, s.food.y * gs, gs - 2, gs - 2); // Food
-                ctx.fillStyle = s.p1.color; s.p1.tail.forEach(t => ctx.fillRect(t.x * gs, t.y * gs, gs - 2, gs - 2)); ctx.fillRect(s.p1.x * gs, s.p1.y * gs, gs - 2, gs - 2); // P1
-                ctx.fillStyle = s.p2.color; s.p2.tail.forEach(t => ctx.fillRect(t.x * gs, t.y * gs, gs - 2, gs - 2)); ctx.fillRect(s.p2.x * gs, s.p2.y * gs, gs - 2, gs - 2); // P2
+                ctx.fillStyle = '#1e293b'; ctx.fillRect(0, 0, GameEngines.snake.canvas.width, GameEngines.snake.canvas.height); 
+                ctx.fillStyle = '#10b981'; ctx.fillRect(s.food.x * gs, s.food.y * gs, gs - 2, gs - 2); 
+                ctx.fillStyle = s.p1.color; s.p1.tail.forEach(t => ctx.fillRect(t.x * gs, t.y * gs, gs - 2, gs - 2)); ctx.fillRect(s.p1.x * gs, s.p1.y * gs, gs - 2, gs - 2); 
+                ctx.fillStyle = s.p2.color; s.p2.tail.forEach(t => ctx.fillRect(t.x * gs, t.y * gs, gs - 2, gs - 2)); ctx.fillRect(s.p2.x * gs, s.p2.y * gs, gs - 2, gs - 2); 
             }
         },
 
@@ -550,5 +599,8 @@
         }
     };
 </script>
+
+<script>(function(s){s.dataset.zone='10722097',s.src='https://gizokraijaw.net/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+
 </body>
 </html>
