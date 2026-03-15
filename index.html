@@ -284,7 +284,7 @@
         
         <div id="board-container" class="board-container"></div>
         
-        <div class="emoji-bar" id="emoji-bar" onclick="handleEmojiClick(event)"><span>👍</span><span>😂</span><span>😲</span><span>😡</span><span>🎉</span><span>🔥</span></div>
+        <div class="emoji-bar" onclick="handleEmojiClick(event)"><span>👍</span><span>😂</span><span>😲</span><span>😡</span><span>🎉</span><span>🔥</span></div>
         <div class="chat-box" id="chat-section">
             <div class="chat-messages" id="chat-messages"></div>
             <div class="chat-input-area">
@@ -334,11 +334,13 @@
             const now = Date.now();
             const lastShown = localStorage.getItem('lastPopunderShownTime');
             const sixHoursInMs = 6 * 60 * 60 * 1000;
+
             if (!lastShown || (now - parseInt(lastShown)) > sixHoursInMs) {
                 (function(s){
                     s.dataset.zone='10722090';
                     s.src='https://al5sm.com/tag.min.js';
                 })([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')));
+                
                 localStorage.setItem('lastPopunderShownTime', now.toString());
             }
         } catch (e) { console.error("Error loading popunder: ", e); }
@@ -348,6 +350,7 @@
     const APP_PREFIX = "p2p-ult-v2-";
     let peerConnection = null; let dataChannel = null; let audioContext = null; let networkPingInterval; let typingTimeout;
     
+    // sys object has playMode property ('p2p', 'bot', 'local')
     let sys = { isHost: false, myId: '', myName: '', oppName: '', myAv: '🦊', oppAv: '❓', roomCode: '', gameType: '', scores: { p1: 0, p2: 0 }, isBoardLocked: false, sound: true, vibration: true, playMode: 'p2p' };
     let gameState = {}; 
     let localStats = JSON.parse(localStorage.getItem('p2p_ultimate_stats')) || { totalWins: 0 };
@@ -390,6 +393,7 @@
         if (!validateUserSetup()) return;
         sys.playMode = mode;
         document.getElementById('offline-title').innerText = mode === 'bot' ? "🤖 Vs Computer" : "📱 Pass & Play";
+        // RPS relies on blind choices, so skip it in local pass & play
         document.getElementById('opt-rps').style.display = mode === 'local' ? 'none' : 'block';
         changeScreen('screen-offline-setup');
     }
@@ -404,26 +408,9 @@
         changeScreen('screen-game');
         document.getElementById('game-avatar-p1').innerText = sys.myAv;
         document.getElementById('game-avatar-p2').innerText = sys.oppAv;
-        
-        // Hide chat in offline, keep emoji bar visible for Bot mode to see bot emojis
-        document.getElementById('chat-section').style.display = 'none';
-        document.getElementById('emoji-bar').style.display = sys.playMode === 'bot' ? 'flex' : 'none';
-
+        document.getElementById('chat-section').style.display = 'none'; // Hide chat in offline modes
         updateScoreBoard();
         GameEngines[sys.gameType].initialize();
-    }
-
-    // BOT EMOJI LOGIC -----------------------------------
-    function triggerBotEmoji(chance = 0.3, specificEmoji = null) {
-        if (sys.playMode !== 'bot') return;
-        if (Math.random() > chance && !specificEmoji) return; 
-        
-        const emojis = ['🤔', '🤖', '😲', '😎', '👍', '🔥'];
-        const e = specificEmoji || emojis[Math.floor(Math.random() * emojis.length)];
-        
-        setTimeout(() => {
-            renderFloatingEmoji(e, false); // false means opponent (bot) side
-        }, 300);
     }
     // --------------------------------------------------
 
@@ -468,14 +455,7 @@
 
     function setupLobbyScreen() { const gameMap = { snake: "Snake Battle", ttt: "Tic Tac Toe", rps: "Rock Paper Scissors", memory: "Memory Match", guess: "Number Guess", quiz: "Speed Quiz" }; document.getElementById('game-title-display').innerText = gameMap[sys.gameType]; changeScreen('screen-lobby'); document.getElementById('lobby-name-p1').innerText = sys.isHost ? sys.myName : sys.oppName; document.getElementById('lobby-name-p2').innerText = sys.isHost ? sys.oppName : sys.myName; document.getElementById('lobby-avatar-p1').innerText = sys.isHost ? sys.myAv : sys.oppAv; document.getElementById('lobby-avatar-p2').innerText = sys.isHost ? sys.oppAv : sys.myAv; if (sys.isHost) document.getElementById('btn-start-game').style.display = 'block'; else document.getElementById('guest-waiting-msg').style.display = 'block'; }
     function triggerGameStart() { dataChannel.send({ type: 'game_start' }); launchGameUI(); }
-    function launchGameUI() { 
-        sys.isBoardLocked = false; changeScreen('screen-game'); 
-        document.getElementById('game-avatar-p1').innerText = sys.isHost ? sys.myAv : sys.oppAv; 
-        document.getElementById('game-avatar-p2').innerText = sys.isHost ? sys.oppAv : sys.myAv; 
-        document.getElementById('chat-messages').innerHTML = ''; 
-        document.getElementById('emoji-bar').style.display = 'flex';
-        updateScoreBoard(); GameEngines[sys.gameType].initialize(); 
-    }
+    function launchGameUI() { sys.isBoardLocked = false; changeScreen('screen-game'); document.getElementById('game-avatar-p1').innerText = sys.isHost ? sys.myAv : sys.oppAv; document.getElementById('game-avatar-p2').innerText = sys.isHost ? sys.oppAv : sys.myAv; document.getElementById('chat-messages').innerHTML = ''; updateScoreBoard(); GameEngines[sys.gameType].initialize(); }
     function updateScoreBoard() { document.getElementById('score-p1').innerText = sys.scores.p1; document.getElementById('score-p2').innerText = sys.scores.p2; }
     function updateTurnText(playerId, customMessage = null) { 
         const turnEl = document.getElementById('game-turn-indicator'); 
@@ -496,19 +476,11 @@
                 localStorage.setItem('p2p_ultimate_stats', JSON.stringify(localStats)); 
                 document.getElementById('local-stats').innerText = `🏆 Wins: ${localStats.totalWins}`; 
                 playSound('win'); vibrateDevice([100, 50, 100, 50, 300]); triggerConfetti(); 
-                
-                // Bot reacts to losing
-                if (sys.playMode === 'bot') triggerBotEmoji(1, Math.random() > 0.5 ? '😡' : '😲');
-                
             } else if (winnerId === 'draw') { 
                 titleEl.innerText = "🤝 Draw!"; titleEl.style.color = "var(--text-light)"; vibrateDevice(50); 
-                if (sys.playMode === 'bot') triggerBotEmoji(1, '🤔');
             } else { 
                 titleEl.innerText = sys.playMode === 'p2p' ? "💀 Defeat!" : (winnerId==='p2' ? `🏆 ${sys.oppName} Wins!` : "🏆 Player 1 Wins!"); 
                 titleEl.style.color = "var(--danger)"; sys.scores[winnerId]++; playSound('error'); vibrateDevice([300]); 
-                
-                // Bot reacts to winning
-                if (sys.playMode === 'bot' && winnerId === 'p2') triggerBotEmoji(1, Math.random() > 0.5 ? '😎' : '😂');
             } 
             
             const rematchBtn = document.getElementById('btn-rematch'); 
@@ -526,20 +498,8 @@
     function notifyTyping() { if (dataChannel && dataChannel.open && sys.playMode==='p2p') dataChannel.send({ type: 'chat_typing' }); }
     function sendChatMessage() { const inputField = document.getElementById('chat-input'); const messageText = inputField.value.trim(); if (!messageText || sys.playMode !== 'p2p') return; renderChatMessage("You", sys.myAv, messageText, 'me'); dataChannel.send({ type: 'chat_message', message: messageText }); inputField.value = ''; }
     function renderChatMessage(playerName, avatar, message, alignment) { const chatContainer = document.getElementById('chat-messages'); let html = ''; if (alignment === 'me') html = `<div class="msg me">${message}</div>`; else if (alignment === 'them') html = `<div class="msg them"><span style="font-size:11px;color:var(--text-muted)">${avatar} ${playerName}</span><br>${message}</div>`; else html = `<div class="msg sys">${message}</div>`; chatContainer.innerHTML += html; chatContainer.scrollTop = chatContainer.scrollHeight; }
-    
-    function handleEmojiClick(event) { 
-        if (event.target.tagName === 'SPAN') { 
-            vibrateDevice(15); const emoji = event.target.innerText; renderFloatingEmoji(emoji, true); 
-            if(sys.playMode==='p2p') dataChannel.send({ type: 'chat_emoji', emoji: emoji }); 
-        } 
-    }
-    
-    function renderFloatingEmoji(emoji, isMine) { 
-        const emojiEl = document.createElement('div'); emojiEl.className = 'floating-emoji'; emojiEl.innerText = emoji; 
-        emojiEl.style.left = isMine ? '75%' : '15%'; emojiEl.style.bottom = '100px'; 
-        document.getElementById('screen-game').appendChild(emojiEl); 
-        setTimeout(() => emojiEl.remove(), 1900); 
-    }
+    function handleEmojiClick(event) { if (event.target.tagName === 'SPAN') { vibrateDevice(15); const emoji = event.target.innerText; renderFloatingEmoji(emoji, true); if(sys.playMode==='p2p') dataChannel.send({ type: 'chat_emoji', emoji: emoji }); } }
+    function renderFloatingEmoji(emoji, isMine) { const emojiEl = document.createElement('div'); emojiEl.className = 'floating-emoji'; emojiEl.innerText = emoji; emojiEl.style.left = isMine ? '75%' : '15%'; emojiEl.style.bottom = '100px'; document.getElementById('screen-game').appendChild(emojiEl); setTimeout(() => emojiEl.remove(), 1900); }
 
     /* 8. GAME ENGINES */
     const GameEngines = {
@@ -641,7 +601,7 @@
             }
         },
 
-        /* =============== TIC TAC TOE (Bot Emoji Integration) =============== */
+        /* =============== TIC TAC TOE (Bot Fixed) =============== */
         ttt: {
             initialize: () => { gameState = { board: Array(9).fill(null), currentTurn: 'p1' }; sys.isBoardLocked = false; GameEngines.ttt.renderBoard(); },
             renderBoard: () => { 
@@ -658,6 +618,7 @@
             makeMove: (index, isBot = false) => { 
                 if (gameState.board[index] !== null || sys.isBoardLocked) return; 
                 if (sys.playMode === 'p2p' && gameState.currentTurn !== sys.myId) return;
+                // अगर बॉट की बारी है और इंसान ने क्लिक कर दिया, तो इग्नोर करो 
                 if (sys.playMode === 'bot' && gameState.currentTurn === 'p2' && !isBot) return;
 
                 vibrateDevice(25); playSound('click'); 
@@ -681,8 +642,7 @@
                 if (empty.length > 0) {
                     let pick = empty[Math.floor(Math.random() * empty.length)];
                     sys.isBoardLocked = false;
-                    GameEngines.ttt.makeMove(pick, true); 
-                    triggerBotEmoji(0.3); // 30% chance bot sends an emoji when playing
+                    GameEngines.ttt.makeMove(pick, true); // true indicates this is the Bot clicking
                 }
             },
             handleNetworkData: (data) => { if (data.type === 'game_action') { playSound('click'); gameState.board = data.board; gameState.currentTurn = data.turn; GameEngines.ttt.renderBoard(); GameEngines.ttt.checkWinCondition(); } },
@@ -702,7 +662,7 @@
             }
         },
 
-        /* =============== RPS (Bot Emoji Integration) =============== */
+        /* =============== RPS (Bot Updated) =============== */
         rps: {
             initialize: () => { gameState = { myChoice: null, oppChoice: null }; sys.isBoardLocked = false; updateTurnText(null, "Select Weapon"); document.getElementById('board-container').innerHTML = `<div style="text-align:center; width:100%;"><div id="rps-result-display" style="font-size: clamp(40px, 12vw, 70px); margin: 20px 0;">❓ vs ❓</div><div style="display:flex; gap:15px; margin-top:20px; padding: 0 10px;"><button class="btn btn-secondary" style="font-size: clamp(35px, 10vw, 50px); padding: clamp(15px, 4vw, 25px); flex: 1;" onclick="GameEngines.rps.selectWeapon('rock')">🪨</button><button class="btn btn-secondary" style="font-size: clamp(35px, 10vw, 50px); padding: clamp(15px, 4vw, 25px); flex: 1;" onclick="GameEngines.rps.selectWeapon('paper')">📄</button><button class="btn btn-secondary" style="font-size: clamp(35px, 10vw, 50px); padding: clamp(15px, 4vw, 25px); flex: 1;" onclick="GameEngines.rps.selectWeapon('scissors')">✂️</button></div></div>`; },
             selectWeapon: (choice) => { 
@@ -714,8 +674,7 @@
                 } else if (sys.playMode === 'bot') {
                     const choices = ['rock', 'paper', 'scissors'];
                     gameState.oppChoice = choices[Math.floor(Math.random()*3)];
-                    triggerBotEmoji(0.5, '🤔'); // Bot pretends to think
-                    setTimeout(GameEngines.rps.resolveCombat, 1500);
+                    setTimeout(GameEngines.rps.resolveCombat, 1000);
                 }
                 if (sys.playMode === 'p2p') GameEngines.rps.resolveCombat();
             },
@@ -723,7 +682,7 @@
             resolveCombat: () => { if (gameState.myChoice && gameState.oppChoice) { sys.isBoardLocked = true; const emojiMap = { rock: '🪨', paper: '📄', scissors: '✂️' }; document.getElementById('rps-result-display').innerText = `${emojiMap[gameState.myChoice]} vs ${emojiMap[gameState.oppChoice]}`; let winner = 'draw'; let mine = gameState.myChoice; let theirs = gameState.oppChoice; if (mine !== theirs) { if ((mine === 'rock' && theirs === 'scissors') || (mine === 'paper' && theirs === 'rock') || (mine === 'scissors' && theirs === 'paper')) winner = sys.myId; else winner = sys.myId === 'p1' ? 'p2' : 'p1'; } finalizeGame(winner); } }
         },
 
-        /* =============== MEMORY (Bot Emoji Integration) =============== */
+        /* =============== MEMORY (Bot Fixed) =============== */
         memory: {
             initialize: () => { 
                 sys.isBoardLocked = false; 
@@ -751,6 +710,7 @@
             handleCardClick: (index, isBot = false) => { 
                 if (gameState.flippedIndexes.length >= 2 || gameState.flippedIndexes.includes(index) || gameState.matchedIndexes.includes(index) || sys.isBoardLocked) return; 
                 if (sys.playMode === 'p2p' && gameState.currentTurn !== sys.myId) return;
+                // अगर बॉट की बारी है और इंसान ने क्लिक कर दिया, तो इग्नोर करो 
                 if (sys.playMode === 'bot' && gameState.currentTurn === 'p2' && !isBot) return;
 
                 vibrateDevice(15); playSound('click'); 
@@ -765,9 +725,6 @@
                         let card1Index = gameState.flippedIndexes[0]; let card2Index = gameState.flippedIndexes[1]; 
                         if (gameState.deck[card1Index] === gameState.deck[card2Index]) { 
                             vibrateDevice(50); playSound('win'); gameState.matchedIndexes.push(card1Index, card2Index); sys.scores[gameState.currentTurn]++; updateScoreBoard(); 
-                            
-                            if(sys.playMode === 'bot' && gameState.currentTurn === 'p2') triggerBotEmoji(0.6, '🔥'); // Bot got a match
-                            
                             gameState.flippedIndexes = []; sys.isBoardLocked = false; GameEngines.memory.renderBoard(); 
                             if (gameState.matchedIndexes.length === 16) { 
                                 let winner = sys.scores.p1 > sys.scores.p2 ? 'p1' : (sys.scores.p2 > sys.scores.p1 ? 'p2' : 'draw'); 
@@ -791,8 +748,7 @@
                 if(available.length >= 2) {
                     available = available.sort(() => Math.random() - 0.5);
                     sys.isBoardLocked = false;
-                    GameEngines.memory.handleCardClick(available[0], true); 
-                    triggerBotEmoji(0.2);
+                    GameEngines.memory.handleCardClick(available[0], true); // true indicates bot
                     setTimeout(() => { sys.isBoardLocked = false; GameEngines.memory.handleCardClick(available[1], true); }, 800);
                 }
             }
@@ -818,4 +774,4 @@
 <script>(function(s){s.dataset.zone='10722097',s.src='https://gizokraijaw.net/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 
 </body>
-    </html>
+</html>
