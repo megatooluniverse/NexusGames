@@ -185,13 +185,32 @@
             <input type="text" id="player-name" placeholder="Enter Your Hero Name" maxlength="15">
         </div>
         
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <button class="btn" style="background: linear-gradient(45deg, #10b981, #059669); margin-bottom: 0;" onclick="vibrateDevice(); startOfflineGame('bot');">🤖 Play Vs Bot</button>
+            <button class="btn" style="background: linear-gradient(45deg, #f59e0b, #d97706); margin-bottom: 0;" onclick="vibrateDevice(); startOfflineGame('local');">📱 Pass & Play</button>
+        </div>
+
         <button class="btn btn-viral" onclick="vibrateDevice(); openOnlineLobby();" style="margin-bottom: 15px;">🌐 See Online Players</button>
-        <button class="btn" onclick="vibrateDevice(); navigateToCreate();">Create New Room</button>
+        <button class="btn" onclick="vibrateDevice(); navigateToCreate();">Create New Room (Online)</button>
         <button class="btn btn-secondary" onclick="vibrateDevice(); navigateToJoin();">Join Existing Room</button>
         
         <div style="display: flex; gap: 10px; margin-top: 15px;">
             <button class="btn btn-secondary" onclick="vibrateDevice(); openModal('modal-settings')">⚙️ Settings</button>
             <button class="btn btn-secondary" onclick="vibrateDevice(); openModal('modal-instructions')">📖 Help</button>
+        </div>
+    </section>
+
+    <section id="screen-offline-setup" class="screen">
+        <h2 id="offline-title">Offline Mode</h2>
+        <div class="card">
+            <h3 style="text-align: left; color: var(--text-muted); font-size: 14px;">Choose Game:</h3>
+            <select id="offline-game-select">
+                <option value="ttt">Tic Tac Toe ❌⭕</option>
+                <option value="memory">Memory Card Match 🧠</option>
+                <option value="rps" id="opt-rps">Rock Paper Scissors 🪨📄✂️</option>
+            </select>
+            <button class="btn btn-accent" onclick="vibrateDevice(); launchOfflineGame()" style="margin-top: 15px;">Start Offline Game</button>
+            <button class="btn btn-secondary" onclick="vibrateDevice(); changeScreen('screen-home')">Cancel</button>
         </div>
     </section>
 
@@ -265,7 +284,7 @@
         
         <div id="board-container" class="board-container"></div>
         
-        <div class="emoji-bar" onclick="handleEmojiClick(event)"><span>👍</span><span>😂</span><span>😲</span><span>😡</span><span>🎉</span><span>🔥</span></div>
+        <div class="emoji-bar" id="emoji-bar" onclick="handleEmojiClick(event)"><span>👍</span><span>😂</span><span>😲</span><span>😡</span><span>🎉</span><span>🔥</span></div>
         <div class="chat-box" id="chat-section">
             <div class="chat-messages" id="chat-messages"></div>
             <div class="chat-input-area">
@@ -279,7 +298,7 @@
     <section id="screen-result" class="screen" style="text-align:center; justify-content:center;">
         <h1 id="result-title" style="font-size: clamp(3em, 15vw, 5em); margin-bottom: 20px;">Victory!</h1>
         <button class="btn btn-accent" id="btn-rematch" onclick="vibrateDevice(); sendRematchRequest()" style="padding: 20px; font-size: 1.2em; margin-bottom: 15px;">Request Rematch</button>
-        <button class="btn btn-secondary" onclick="vibrateDevice(); abortHosting()">Exit Room</button>
+        <button class="btn btn-secondary" id="btn-exit" onclick="vibrateDevice(); abortHosting()">Exit Room</button>
     </section>
 
     <div class="ad-footer">
@@ -310,38 +329,26 @@
 </div>
 
 <script>
-    // POPUNDER AD LOGIC (6 HOURS LIMIT)
     function initializePopunderAd() {
         try {
             const now = Date.now();
             const lastShown = localStorage.getItem('lastPopunderShownTime');
             const sixHoursInMs = 6 * 60 * 60 * 1000;
-
             if (!lastShown || (now - parseInt(lastShown)) > sixHoursInMs) {
-                // Load Ad Script Dynamically
                 (function(s){
                     s.dataset.zone='10722090';
                     s.src='https://al5sm.com/tag.min.js';
                 })([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')));
-                
-                // Save new timestamp
                 localStorage.setItem('lastPopunderShownTime', now.toString());
-                console.log("Popunder Ad Loaded Successfully.");
-            } else {
-                console.log("Popunder Ad is on cooldown (6 hours logic).");
             }
-        } catch (e) {
-            console.error("Error loading popunder: ", e);
-        }
+        } catch (e) { console.error("Error loading popunder: ", e); }
     }
-
-    // Call Popunder check on window load
     window.addEventListener('load', initializePopunderAd);
-
 
     const APP_PREFIX = "p2p-ult-v2-";
     let peerConnection = null; let dataChannel = null; let audioContext = null; let networkPingInterval; let typingTimeout;
-    let sys = { isHost: false, myId: '', myName: '', oppName: '', myAv: '🦊', oppAv: '❓', roomCode: '', gameType: '', scores: { p1: 0, p2: 0 }, isBoardLocked: false, sound: true, vibration: true };
+    
+    let sys = { isHost: false, myId: '', myName: '', oppName: '', myAv: '🦊', oppAv: '❓', roomCode: '', gameType: '', scores: { p1: 0, p2: 0 }, isBoardLocked: false, sound: true, vibration: true, playMode: 'p2p' };
     let gameState = {}; 
     let localStats = JSON.parse(localStorage.getItem('p2p_ultimate_stats')) || { totalWins: 0 };
     document.getElementById('local-stats').innerText = `🏆 Wins: ${localStats.totalWins}`;
@@ -350,11 +357,11 @@
     function toggleVibSetting() { sys.vibration = document.getElementById('setting-vibration').checked; if(sys.vibration) vibrateDevice([30, 50, 30]); showToast(sys.vibration ? "Vibration Enabled" : "Vibration Disabled"); }
 
     window.onload = () => {
-        initializePopunderAd(); // Extra safety call
+        initializePopunderAd();
         const urlParams = new URLSearchParams(window.location.search); const roomFromUrl = urlParams.get('room'); const savedHostState = sessionStorage.getItem('p2p_host_state');
         if (savedHostState) {
             const state = JSON.parse(savedHostState); sys.myName = state.name; sys.myAv = state.avatar; sys.gameType = state.gameType; sys.roomCode = state.roomCode;
-            document.getElementById('player-name').value = sys.myName; document.getElementById('sys-bar').style.display = 'flex'; sys.isHost = true; sys.myId = 'p1';
+            document.getElementById('player-name').value = sys.myName; document.getElementById('sys-bar').style.display = 'flex'; sys.isHost = true; sys.myId = 'p1'; sys.playMode = 'p2p';
             document.getElementById('create-form').style.display = 'none'; document.getElementById('create-waiting').style.display = 'block'; document.getElementById('display-code').innerText = sys.roomCode;
             changeScreen('screen-create');
             initializePeer(APP_PREFIX + sys.roomCode, () => { document.getElementById('host-status-text').innerHTML = `Waiting for player... <span style="color:var(--accent);">●</span>`; });
@@ -377,13 +384,60 @@
     function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
     function selectAvatar(event, emoji) { vibrateDevice(10); document.querySelectorAll('.avatar-opt').forEach(el => el.classList.remove('selected')); event.target.classList.add('selected'); sys.myAv = emoji; }
     function validateUserSetup() { const nameInput = document.getElementById('player-name').value.trim(); if (!nameInput) { showToast("Enter your Hero Name first!", true); vibrateDevice([50, 50, 50]); return false; } sys.myName = nameInput; document.getElementById('sys-bar').style.display = 'flex'; return true; }
-    function navigateToCreate() { if (validateUserSetup()) changeScreen('screen-create'); }
-    function navigateToJoin() { if (validateUserSetup()) changeScreen('screen-join'); }
+    
+    // OFFLINE GAME LOGIC --------------------------------
+    function startOfflineGame(mode) {
+        if (!validateUserSetup()) return;
+        sys.playMode = mode;
+        document.getElementById('offline-title').innerText = mode === 'bot' ? "🤖 Vs Computer" : "📱 Pass & Play";
+        document.getElementById('opt-rps').style.display = mode === 'local' ? 'none' : 'block';
+        changeScreen('screen-offline-setup');
+    }
+
+    function launchOfflineGame() {
+        sys.gameType = document.getElementById('offline-game-select').value;
+        sys.isHost = true; sys.myId = 'p1';
+        sys.oppName = sys.playMode === 'bot' ? 'Computer' : 'Player 2';
+        sys.oppAv = sys.playMode === 'bot' ? '🤖' : '👽';
+        sys.scores = { p1: 0, p2: 0 };
+        document.getElementById('game-title-display').innerText = "Offline Match";
+        changeScreen('screen-game');
+        document.getElementById('game-avatar-p1').innerText = sys.myAv;
+        document.getElementById('game-avatar-p2').innerText = sys.oppAv;
+        
+        // Hide chat in offline, keep emoji bar visible for Bot mode to see bot emojis
+        document.getElementById('chat-section').style.display = 'none';
+        document.getElementById('emoji-bar').style.display = sys.playMode === 'bot' ? 'flex' : 'none';
+
+        updateScoreBoard();
+        GameEngines[sys.gameType].initialize();
+    }
+
+    // BOT EMOJI LOGIC -----------------------------------
+    function triggerBotEmoji(chance = 0.3, specificEmoji = null) {
+        if (sys.playMode !== 'bot') return;
+        if (Math.random() > chance && !specificEmoji) return; 
+        
+        const emojis = ['🤔', '🤖', '😲', '😎', '👍', '🔥'];
+        const e = specificEmoji || emojis[Math.floor(Math.random() * emojis.length)];
+        
+        setTimeout(() => {
+            renderFloatingEmoji(e, false); // false means opponent (bot) side
+        }, 300);
+    }
+    // --------------------------------------------------
+
+    function navigateToCreate() { if (validateUserSetup()) { sys.playMode = 'p2p'; changeScreen('screen-create'); } }
+    function navigateToJoin() { if (validateUserSetup()) { sys.playMode = 'p2p'; changeScreen('screen-join'); } }
     function toggleSoundSetting() { sys.sound = document.getElementById('setting-sound').checked; vibrateDevice(20); }
     function toggleThemeSetting() { const isLightMode = document.getElementById('setting-theme').checked; vibrateDevice(20); if (isLightMode) document.body.classList.add('light-mode'); else document.body.classList.remove('light-mode'); }
     function copyRoomCode() { const inviteLink = window.location.origin + window.location.pathname + '?room=' + sys.roomCode; navigator.clipboard.writeText(inviteLink); showToast("Link copied! 📋"); }
     function shareViaWhatsApp() { const inviteLink = window.location.origin + window.location.pathname + '?room=' + sys.roomCode; const text = `🎮 Play this game with me directly in browser: ${inviteLink}`; window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank'); }
-    function abortHosting() { sessionStorage.removeItem('p2p_host_state'); location.href = window.location.origin + window.location.pathname; }
+    
+    function abortHosting() { 
+        if(sys.playMode !== 'p2p') { sys.playMode = 'p2p'; changeScreen('screen-home'); return; }
+        sessionStorage.removeItem('p2p_host_state'); location.href = window.location.origin + window.location.pathname; 
+    }
 
     function showToast(message, isError = false) { const container = document.getElementById('toast-container'); const toast = document.createElement('div'); toast.className = `toast-msg ${isError ? 'toast-error' : 'toast-success'}`; toast.innerHTML = isError ? `❌ ${message}` : `✅ ${message}`; container.appendChild(toast); playSound(isError ? 'error' : 'click'); setTimeout(() => { toast.classList.add('toast-hide'); setTimeout(() => toast.remove(), 300); }, 2500); }
     function playSound(type) { if (!sys.sound) return; if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)(); const osc = audioContext.createOscillator(); const gain = audioContext.createGain(); osc.connect(gain); gain.connect(audioContext.destination); if (type === 'click') { osc.frequency.setValueAtTime(600, audioContext.currentTime); osc.frequency.exponentialRampToValueAtTime(1000, audioContext.currentTime + 0.1); gain.gain.setValueAtTime(0.1, audioContext.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1); osc.start(); osc.stop(audioContext.currentTime + 0.1); } else if (type === 'win') { osc.frequency.setValueAtTime(400, audioContext.currentTime); osc.frequency.setValueAtTime(800, audioContext.currentTime + 0.1); osc.frequency.setValueAtTime(1200, audioContext.currentTime + 0.2); gain.gain.setValueAtTime(0.2, audioContext.currentTime); gain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.6); osc.start(); osc.stop(audioContext.currentTime + 0.6); } else if (type === 'error') { osc.type = 'square'; osc.frequency.setValueAtTime(200, audioContext.currentTime); osc.frequency.linearRampToValueAtTime(100, audioContext.currentTime + 0.2); gain.gain.setValueAtTime(0.1, audioContext.currentTime); gain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.2); osc.start(); osc.stop(audioContext.currentTime + 0.2); } }
@@ -393,8 +447,8 @@
     function startNetworkPing() { networkPingInterval = setInterval(() => { if (dataChannel && dataChannel.open) { dataChannel.send({ type: 'network_ping', timestamp: Date.now() }); } }, 2000); }
     function setupDataChannel(channel) { dataChannel = channel; dataChannel.on('open', () => { showToast("Connection Established!"); vibrateDevice([50, 100, 50]); startNetworkPing(); if (!sys.isHost) dataChannel.send({ type: 'system_join', name: sys.myName, avatar: sys.myAv }); }); dataChannel.on('data', (data) => routeNetworkData(data)); dataChannel.on('close', () => { clearInterval(networkPingInterval); showToast("Opponent Disconnected.", true); setTimeout(() => abortHosting(), 2000); }); }
 
-    function startHostingProcess() { sys.isHost = true; sys.myId = 'p1'; const selectBox = document.getElementById('game-select'); sys.gameType = selectBox.value; sys.roomCode = Math.floor(100000 + Math.random() * 900000).toString(); sessionStorage.setItem('p2p_host_state', JSON.stringify({ roomCode: sys.roomCode, gameType: sys.gameType, name: sys.myName, avatar: sys.myAv })); document.getElementById('create-form').style.display = 'none'; document.getElementById('create-waiting').style.display = 'block'; document.getElementById('display-code').innerText = sys.roomCode; initializePeer(APP_PREFIX + sys.roomCode, () => {}); peerConnection.on('connection', (channel) => { setupDataChannel(channel); }); }
-    function startJoiningProcess() { const codeInput = document.getElementById('join-code').value.trim().toUpperCase(); if (codeInput.length !== 6) return showToast("Enter 6-digit code!", true); document.getElementById('btn-join').disabled = true; document.getElementById('btn-join').innerText = "Connecting..."; sys.isHost = false; sys.myId = 'p2'; sys.roomCode = codeInput; initializePeer(undefined, () => { const channel = peerConnection.connect(APP_PREFIX + sys.roomCode, { reliable: true }); setupDataChannel(channel); }); }
+    function startHostingProcess() { sys.isHost = true; sys.myId = 'p1'; sys.playMode = 'p2p'; const selectBox = document.getElementById('game-select'); sys.gameType = selectBox.value; sys.roomCode = Math.floor(100000 + Math.random() * 900000).toString(); sessionStorage.setItem('p2p_host_state', JSON.stringify({ roomCode: sys.roomCode, gameType: sys.gameType, name: sys.myName, avatar: sys.myAv })); document.getElementById('create-form').style.display = 'none'; document.getElementById('create-waiting').style.display = 'block'; document.getElementById('display-code').innerText = sys.roomCode; initializePeer(APP_PREFIX + sys.roomCode, () => {}); peerConnection.on('connection', (channel) => { setupDataChannel(channel); }); }
+    function startJoiningProcess() { const codeInput = document.getElementById('join-code').value.trim().toUpperCase(); if (codeInput.length !== 6) return showToast("Enter 6-digit code!", true); document.getElementById('btn-join').disabled = true; document.getElementById('btn-join').innerText = "Connecting..."; sys.isHost = false; sys.myId = 'p2'; sys.roomCode = codeInput; sys.playMode = 'p2p'; initializePeer(undefined, () => { const channel = peerConnection.connect(APP_PREFIX + sys.roomCode, { reliable: true }); setupDataChannel(channel); }); }
 
     function routeNetworkData(data) {
         switch(data.type) {
@@ -414,22 +468,81 @@
 
     function setupLobbyScreen() { const gameMap = { snake: "Snake Battle", ttt: "Tic Tac Toe", rps: "Rock Paper Scissors", memory: "Memory Match", guess: "Number Guess", quiz: "Speed Quiz" }; document.getElementById('game-title-display').innerText = gameMap[sys.gameType]; changeScreen('screen-lobby'); document.getElementById('lobby-name-p1').innerText = sys.isHost ? sys.myName : sys.oppName; document.getElementById('lobby-name-p2').innerText = sys.isHost ? sys.oppName : sys.myName; document.getElementById('lobby-avatar-p1').innerText = sys.isHost ? sys.myAv : sys.oppAv; document.getElementById('lobby-avatar-p2').innerText = sys.isHost ? sys.oppAv : sys.myAv; if (sys.isHost) document.getElementById('btn-start-game').style.display = 'block'; else document.getElementById('guest-waiting-msg').style.display = 'block'; }
     function triggerGameStart() { dataChannel.send({ type: 'game_start' }); launchGameUI(); }
-    function launchGameUI() { sys.isBoardLocked = false; changeScreen('screen-game'); document.getElementById('game-avatar-p1').innerText = sys.isHost ? sys.myAv : sys.oppAv; document.getElementById('game-avatar-p2').innerText = sys.isHost ? sys.oppAv : sys.myAv; document.getElementById('chat-messages').innerHTML = ''; updateScoreBoard(); GameEngines[sys.gameType].initialize(); }
+    function launchGameUI() { 
+        sys.isBoardLocked = false; changeScreen('screen-game'); 
+        document.getElementById('game-avatar-p1').innerText = sys.isHost ? sys.myAv : sys.oppAv; 
+        document.getElementById('game-avatar-p2').innerText = sys.isHost ? sys.oppAv : sys.myAv; 
+        document.getElementById('chat-messages').innerHTML = ''; 
+        document.getElementById('emoji-bar').style.display = 'flex';
+        updateScoreBoard(); GameEngines[sys.gameType].initialize(); 
+    }
     function updateScoreBoard() { document.getElementById('score-p1').innerText = sys.scores.p1; document.getElementById('score-p2').innerText = sys.scores.p2; }
-    function updateTurnText(playerId, customMessage = null) { const turnEl = document.getElementById('game-turn-indicator'); if (customMessage) { turnEl.innerText = customMessage; turnEl.style.color = 'var(--text-light)'; return; } turnEl.innerText = playerId === sys.myId ? "Your Turn" : "Opponent's Turn"; turnEl.style.color = playerId === sys.myId ? 'var(--accent)' : 'var(--danger)'; }
+    function updateTurnText(playerId, customMessage = null) { 
+        const turnEl = document.getElementById('game-turn-indicator'); 
+        if (customMessage) { turnEl.innerText = customMessage; turnEl.style.color = 'var(--text-light)'; return; } 
+        if(sys.playMode === 'p2p') {
+            turnEl.innerText = playerId === sys.myId ? "Your Turn" : "Opponent's Turn"; 
+            turnEl.style.color = playerId === sys.myId ? 'var(--accent)' : 'var(--danger)'; 
+        }
+    }
     
-    function finalizeGame(winnerId) { setTimeout(() => { changeScreen('screen-result'); const titleEl = document.getElementById('result-title'); if (winnerId === sys.myId) { titleEl.innerText = "🏆 Victory!"; titleEl.style.color = "var(--accent)"; sys.scores[sys.myId]++; localStats.totalWins++; localStorage.setItem('p2p_ultimate_stats', JSON.stringify(localStats)); document.getElementById('local-stats').innerText = `🏆 Wins: ${localStats.totalWins}`; playSound('win'); vibrateDevice([100, 50, 100, 50, 300]); triggerConfetti(); } else if (winnerId === 'draw') { titleEl.innerText = "🤝 Draw!"; titleEl.style.color = "var(--text-light)"; vibrateDevice(50); } else { titleEl.innerText = "💀 Defeat!"; titleEl.style.color = "var(--danger)"; sys.scores[winnerId]++; playSound('error'); vibrateDevice([300]); } const rematchBtn = document.getElementById('btn-rematch'); rematchBtn.innerText = "Request Rematch"; rematchBtn.onclick = () => { vibrateDevice(); sendRematchRequest(); }; }, 1200); }
+    function finalizeGame(winnerId) { 
+        setTimeout(() => { 
+            changeScreen('screen-result'); 
+            const titleEl = document.getElementById('result-title'); 
+            if (winnerId === sys.myId) { 
+                titleEl.innerText = "🏆 Victory!"; titleEl.style.color = "var(--accent)"; 
+                sys.scores[sys.myId]++; localStats.totalWins++; 
+                localStorage.setItem('p2p_ultimate_stats', JSON.stringify(localStats)); 
+                document.getElementById('local-stats').innerText = `🏆 Wins: ${localStats.totalWins}`; 
+                playSound('win'); vibrateDevice([100, 50, 100, 50, 300]); triggerConfetti(); 
+                
+                // Bot reacts to losing
+                if (sys.playMode === 'bot') triggerBotEmoji(1, Math.random() > 0.5 ? '😡' : '😲');
+                
+            } else if (winnerId === 'draw') { 
+                titleEl.innerText = "🤝 Draw!"; titleEl.style.color = "var(--text-light)"; vibrateDevice(50); 
+                if (sys.playMode === 'bot') triggerBotEmoji(1, '🤔');
+            } else { 
+                titleEl.innerText = sys.playMode === 'p2p' ? "💀 Defeat!" : (winnerId==='p2' ? `🏆 ${sys.oppName} Wins!` : "🏆 Player 1 Wins!"); 
+                titleEl.style.color = "var(--danger)"; sys.scores[winnerId]++; playSound('error'); vibrateDevice([300]); 
+                
+                // Bot reacts to winning
+                if (sys.playMode === 'bot' && winnerId === 'p2') triggerBotEmoji(1, Math.random() > 0.5 ? '😎' : '😂');
+            } 
+            
+            const rematchBtn = document.getElementById('btn-rematch'); 
+            if(sys.playMode === 'p2p'){
+                rematchBtn.innerText = "Request Rematch"; 
+                rematchBtn.onclick = () => { vibrateDevice(); sendRematchRequest(); }; 
+            } else {
+                rematchBtn.innerText = "Play Again"; 
+                rematchBtn.onclick = () => { vibrateDevice(); launchOfflineGame(); }; 
+            }
+        }, 1200); 
+    }
     function sendRematchRequest() { dataChannel.send({ type: 'rematch_request' }); const btn = document.getElementById('btn-rematch'); btn.innerText = "Waiting..."; btn.onclick = null; }
 
-    function notifyTyping() { if (dataChannel && dataChannel.open) dataChannel.send({ type: 'chat_typing' }); }
-    function sendChatMessage() { const inputField = document.getElementById('chat-input'); const messageText = inputField.value.trim(); if (!messageText) return; renderChatMessage("You", sys.myAv, messageText, 'me'); dataChannel.send({ type: 'chat_message', message: messageText }); inputField.value = ''; }
+    function notifyTyping() { if (dataChannel && dataChannel.open && sys.playMode==='p2p') dataChannel.send({ type: 'chat_typing' }); }
+    function sendChatMessage() { const inputField = document.getElementById('chat-input'); const messageText = inputField.value.trim(); if (!messageText || sys.playMode !== 'p2p') return; renderChatMessage("You", sys.myAv, messageText, 'me'); dataChannel.send({ type: 'chat_message', message: messageText }); inputField.value = ''; }
     function renderChatMessage(playerName, avatar, message, alignment) { const chatContainer = document.getElementById('chat-messages'); let html = ''; if (alignment === 'me') html = `<div class="msg me">${message}</div>`; else if (alignment === 'them') html = `<div class="msg them"><span style="font-size:11px;color:var(--text-muted)">${avatar} ${playerName}</span><br>${message}</div>`; else html = `<div class="msg sys">${message}</div>`; chatContainer.innerHTML += html; chatContainer.scrollTop = chatContainer.scrollHeight; }
-    function handleEmojiClick(event) { if (event.target.tagName === 'SPAN') { vibrateDevice(15); const emoji = event.target.innerText; renderFloatingEmoji(emoji, true); dataChannel.send({ type: 'chat_emoji', emoji: emoji }); } }
-    function renderFloatingEmoji(emoji, isMine) { const emojiEl = document.createElement('div'); emojiEl.className = 'floating-emoji'; emojiEl.innerText = emoji; emojiEl.style.left = isMine ? '75%' : '15%'; emojiEl.style.bottom = '100px'; document.getElementById('screen-game').appendChild(emojiEl); setTimeout(() => emojiEl.remove(), 1900); }
+    
+    function handleEmojiClick(event) { 
+        if (event.target.tagName === 'SPAN') { 
+            vibrateDevice(15); const emoji = event.target.innerText; renderFloatingEmoji(emoji, true); 
+            if(sys.playMode==='p2p') dataChannel.send({ type: 'chat_emoji', emoji: emoji }); 
+        } 
+    }
+    
+    function renderFloatingEmoji(emoji, isMine) { 
+        const emojiEl = document.createElement('div'); emojiEl.className = 'floating-emoji'; emojiEl.innerText = emoji; 
+        emojiEl.style.left = isMine ? '75%' : '15%'; emojiEl.style.bottom = '100px'; 
+        document.getElementById('screen-game').appendChild(emojiEl); 
+        setTimeout(() => emojiEl.remove(), 1900); 
+    }
 
     /* 8. GAME ENGINES */
     const GameEngines = {
-        /* =============== SNAKE BATTLE ENGINE (With Swipe & D-Pad) =============== */
         snake: {
             loop: null, ctx: null, canvas: null, gridSize: 15, tileCount: 20, touchStartX: 0, touchStartY: 0,
             state: { p1: {x: 5, y: 10, dx: 1, dy: 0, tail: [], color: '#3b82f6'}, p2: {x: 14, y: 10, dx: -1, dy: 0, tail: [], color: '#ef4444'}, food: {x: 10, y: 5} },
@@ -462,85 +575,52 @@
                     GameEngines.snake.loop = setInterval(GameEngines.snake.gameTick, 200); 
                 }
             },
-            handleTouchStart: (e) => {
-                if(sys.isBoardLocked) return;
-                e.preventDefault();
-                GameEngines.snake.touchStartX = e.touches[0].clientX;
-                GameEngines.snake.touchStartY = e.touches[0].clientY;
-            },
+            handleTouchStart: (e) => { if(sys.isBoardLocked) return; e.preventDefault(); GameEngines.snake.touchStartX = e.touches[0].clientX; GameEngines.snake.touchStartY = e.touches[0].clientY; },
             handleTouchMove: (e) => {
                 if(sys.isBoardLocked || !GameEngines.snake.touchStartX || !GameEngines.snake.touchStartY) return;
                 e.preventDefault();
-                
-                let touchEndX = e.touches[0].clientX;
-                let touchEndY = e.touches[0].clientY;
-                
-                let dx = touchEndX - GameEngines.snake.touchStartX;
-                let dy = touchEndY - GameEngines.snake.touchStartY;
-                
+                let touchEndX = e.touches[0].clientX; let touchEndY = e.touches[0].clientY;
+                let dx = touchEndX - GameEngines.snake.touchStartX; let dy = touchEndY - GameEngines.snake.touchStartY;
                 if (Math.abs(dx) > 30 || Math.abs(dy) > 30) {
-                    if (Math.abs(dx) > Math.abs(dy)) {
-                        if (dx > 0) GameEngines.snake.sendDir(1, 0); 
-                        else GameEngines.snake.sendDir(-1, 0); 
-                    } else {
-                        if (dy > 0) GameEngines.snake.sendDir(0, 1); 
-                        else GameEngines.snake.sendDir(0, -1); 
-                    }
+                    if (Math.abs(dx) > Math.abs(dy)) { if (dx > 0) GameEngines.snake.sendDir(1, 0); else GameEngines.snake.sendDir(-1, 0); } 
+                    else { if (dy > 0) GameEngines.snake.sendDir(0, 1); else GameEngines.snake.sendDir(0, -1); }
                     GameEngines.snake.touchStartX = 0; GameEngines.snake.touchStartY = 0; 
                 }
             },
             sendDir: (dx, dy) => {
                 vibrateDevice(20);
                 const myState = sys.myId === 'p1' ? GameEngines.snake.state.p1 : GameEngines.snake.state.p2;
-                if (dx !== 0 && myState.dx === -dx) return;
-                if (dy !== 0 && myState.dy === -dy) return;
-                
+                if (dx !== 0 && myState.dx === -dx) return; if (dy !== 0 && myState.dy === -dy) return;
                 if (sys.isHost) { GameEngines.snake.state.p1.dx = dx; GameEngines.snake.state.p1.dy = dy; } 
                 else { dataChannel.send({ type: 'snake_dir', dx: dx, dy: dy }); }
             },
             handleKey: (e) => {
                 if(sys.isBoardLocked) return;
-                if(e.key === 'ArrowUp') GameEngines.snake.sendDir(0, -1);
-                if(e.key === 'ArrowDown') GameEngines.snake.sendDir(0, 1);
-                if(e.key === 'ArrowLeft') GameEngines.snake.sendDir(-1, 0);
-                if(e.key === 'ArrowRight') GameEngines.snake.sendDir(1, 0);
+                if(e.key === 'ArrowUp') GameEngines.snake.sendDir(0, -1); if(e.key === 'ArrowDown') GameEngines.snake.sendDir(0, 1);
+                if(e.key === 'ArrowLeft') GameEngines.snake.sendDir(-1, 0); if(e.key === 'ArrowRight') GameEngines.snake.sendDir(1, 0);
             },
             handleNetworkData: (data) => {
-                if (data.type === 'snake_dir' && sys.isHost) {
-                    GameEngines.snake.state.p2.dx = data.dx; GameEngines.snake.state.p2.dy = data.dy;
-                } else if (data.type === 'snake_state' && !sys.isHost) {
-                    GameEngines.snake.state = data.state;
-                    GameEngines.snake.drawBoard();
-                } else if (data.type === 'snake_gameover') {
+                if (data.type === 'snake_dir' && sys.isHost) { GameEngines.snake.state.p2.dx = data.dx; GameEngines.snake.state.p2.dy = data.dy; } 
+                else if (data.type === 'snake_state' && !sys.isHost) { GameEngines.snake.state = data.state; GameEngines.snake.drawBoard(); } 
+                else if (data.type === 'snake_gameover') {
                     sys.isBoardLocked = true; clearInterval(GameEngines.snake.loop); document.removeEventListener('keydown', GameEngines.snake.handleKey); document.getElementById('chat-section').style.display = 'flex';
                     finalizeGame(data.winner);
                 }
             },
             gameTick: () => {
-                if(sys.isBoardLocked) return;
-                let s = GameEngines.snake.state;
-                
+                if(sys.isBoardLocked) return; let s = GameEngines.snake.state;
                 [s.p1, s.p2].forEach(p => { p.tail.push({x: p.x, y: p.y}); p.x += p.dx; p.y += p.dy; });
-                
-                [s.p1, s.p2].forEach(p => {
-                    if (p.x === s.food.x && p.y === s.food.y) { playSound('click'); GameEngines.snake.placeFood(); } 
-                    else { p.tail.shift(); }
-                });
+                [s.p1, s.p2].forEach(p => { if (p.x === s.food.x && p.y === s.food.y) { playSound('click'); GameEngines.snake.placeFood(); } else { p.tail.shift(); } });
 
-                let p1Crash = GameEngines.snake.checkCrash(s.p1, s.p2);
-                let p2Crash = GameEngines.snake.checkCrash(s.p2, s.p1);
-                
-                let winner = null;
-                if (p1Crash && p2Crash) winner = 'draw';
-                else if (p1Crash) winner = 'p2';
-                else if (p2Crash) winner = 'p1';
+                let p1Crash = GameEngines.snake.checkCrash(s.p1, s.p2); let p2Crash = GameEngines.snake.checkCrash(s.p2, s.p1);
+                let winner = null; if (p1Crash && p2Crash) winner = 'draw'; else if (p1Crash) winner = 'p2'; else if (p2Crash) winner = 'p1';
 
                 GameEngines.snake.drawBoard();
-                dataChannel.send({ type: 'snake_state', state: s });
+                if(sys.playMode === 'p2p') dataChannel.send({ type: 'snake_state', state: s });
 
                 if (winner) {
                     sys.isBoardLocked = true; clearInterval(GameEngines.snake.loop); document.removeEventListener('keydown', GameEngines.snake.handleKey); document.getElementById('chat-section').style.display = 'flex';
-                    dataChannel.send({ type: 'snake_gameover', winner: winner }); finalizeGame(winner);
+                    if(sys.playMode === 'p2p') dataChannel.send({ type: 'snake_gameover', winner: winner }); finalizeGame(winner);
                 }
             },
             checkCrash: (p, opp) => {
@@ -561,26 +641,161 @@
             }
         },
 
-        /* =============== OTHER GAMES =============== */
+        /* =============== TIC TAC TOE (Bot Emoji Integration) =============== */
         ttt: {
-            initialize: () => { gameState = { board: Array(9).fill(null), currentTurn: 'p1' }; GameEngines.ttt.renderBoard(); },
-            renderBoard: () => { let html = `<div class="ttt-grid">`; for (let i = 0; i < 9; i++) { let cellValue = ''; if (gameState.board[i] === 'p1') cellValue = '❌'; if (gameState.board[i] === 'p2') cellValue = '⭕'; html += `<div class="ttt-cell" onclick="GameEngines.ttt.makeMove(${i})" id="cell-${i}">${cellValue}</div>`; } document.getElementById('board-container').innerHTML = html + `</div>`; updateTurnText(gameState.currentTurn); },
-            makeMove: (index) => { if (gameState.currentTurn !== sys.myId || gameState.board[index] !== null || sys.isBoardLocked) return; vibrateDevice(25); playSound('click'); gameState.board[index] = sys.myId; gameState.currentTurn = sys.myId === 'p1' ? 'p2' : 'p1'; dataChannel.send({ type: 'game_action', board: gameState.board, turn: gameState.currentTurn }); GameEngines.ttt.renderBoard(); GameEngines.ttt.checkWinCondition(); },
+            initialize: () => { gameState = { board: Array(9).fill(null), currentTurn: 'p1' }; sys.isBoardLocked = false; GameEngines.ttt.renderBoard(); },
+            renderBoard: () => { 
+                let html = `<div class="ttt-grid">`; 
+                for (let i = 0; i < 9; i++) { 
+                    let cellValue = ''; if (gameState.board[i] === 'p1') cellValue = '❌'; if (gameState.board[i] === 'p2') cellValue = '⭕'; 
+                    html += `<div class="ttt-cell" onclick="GameEngines.ttt.makeMove(${i})" id="cell-${i}">${cellValue}</div>`; 
+                } 
+                document.getElementById('board-container').innerHTML = html + `</div>`; 
+                
+                let turnName = gameState.currentTurn === 'p1' ? sys.myName : (sys.playMode === 'bot' ? 'Computer' : (sys.playMode === 'local' ? 'Player 2' : 'Opponent'));
+                updateTurnText(gameState.currentTurn, turnName + "'s Turn");
+            },
+            makeMove: (index, isBot = false) => { 
+                if (gameState.board[index] !== null || sys.isBoardLocked) return; 
+                if (sys.playMode === 'p2p' && gameState.currentTurn !== sys.myId) return;
+                if (sys.playMode === 'bot' && gameState.currentTurn === 'p2' && !isBot) return;
+
+                vibrateDevice(25); playSound('click'); 
+                gameState.board[index] = gameState.currentTurn; 
+                
+                if (GameEngines.ttt.checkWinCondition()) return;
+
+                gameState.currentTurn = gameState.currentTurn === 'p1' ? 'p2' : 'p1'; 
+                if (sys.playMode === 'p2p') dataChannel.send({ type: 'game_action', board: gameState.board, turn: gameState.currentTurn }); 
+                
+                GameEngines.ttt.renderBoard(); 
+
+                if (sys.playMode === 'bot' && gameState.currentTurn === 'p2') {
+                    sys.isBoardLocked = true;
+                    setTimeout(GameEngines.ttt.playBot, 800);
+                }
+            },
+            playBot: () => {
+                let empty = [];
+                gameState.board.forEach((val, idx) => { if (!val) empty.push(idx); });
+                if (empty.length > 0) {
+                    let pick = empty[Math.floor(Math.random() * empty.length)];
+                    sys.isBoardLocked = false;
+                    GameEngines.ttt.makeMove(pick, true); 
+                    triggerBotEmoji(0.3); // 30% chance bot sends an emoji when playing
+                }
+            },
             handleNetworkData: (data) => { if (data.type === 'game_action') { playSound('click'); gameState.board = data.board; gameState.currentTurn = data.turn; GameEngines.ttt.renderBoard(); GameEngines.ttt.checkWinCondition(); } },
-            checkWinCondition: () => { const winPatterns = [[0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6]]; for (let pattern of winPatterns) { const [a, b, c] = pattern; if (gameState.board[a] && gameState.board[a] === gameState.board[b] && gameState.board[a] === gameState.board[c]) { sys.isBoardLocked = true; document.getElementById(`cell-${a}`).classList.add('ttt-win'); document.getElementById(`cell-${b}`).classList.add('ttt-win'); document.getElementById(`cell-${c}`).classList.add('ttt-win'); return finalizeGame(gameState.board[a]); } } if (!gameState.board.includes(null)) { sys.isBoardLocked = true; finalizeGame('draw'); } }
+            checkWinCondition: () => { 
+                const winPatterns = [[0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6]]; 
+                for (let pattern of winPatterns) { 
+                    const [a, b, c] = pattern; 
+                    if (gameState.board[a] && gameState.board[a] === gameState.board[b] && gameState.board[a] === gameState.board[c]) { 
+                        sys.isBoardLocked = true; 
+                        document.getElementById(`cell-${a}`).classList.add('ttt-win'); document.getElementById(`cell-${b}`).classList.add('ttt-win'); document.getElementById(`cell-${c}`).classList.add('ttt-win'); 
+                        finalizeGame(gameState.board[a]); 
+                        return true;
+                    } 
+                } 
+                if (!gameState.board.includes(null)) { sys.isBoardLocked = true; finalizeGame('draw'); return true; } 
+                return false;
+            }
         },
+
+        /* =============== RPS (Bot Emoji Integration) =============== */
         rps: {
             initialize: () => { gameState = { myChoice: null, oppChoice: null }; sys.isBoardLocked = false; updateTurnText(null, "Select Weapon"); document.getElementById('board-container').innerHTML = `<div style="text-align:center; width:100%;"><div id="rps-result-display" style="font-size: clamp(40px, 12vw, 70px); margin: 20px 0;">❓ vs ❓</div><div style="display:flex; gap:15px; margin-top:20px; padding: 0 10px;"><button class="btn btn-secondary" style="font-size: clamp(35px, 10vw, 50px); padding: clamp(15px, 4vw, 25px); flex: 1;" onclick="GameEngines.rps.selectWeapon('rock')">🪨</button><button class="btn btn-secondary" style="font-size: clamp(35px, 10vw, 50px); padding: clamp(15px, 4vw, 25px); flex: 1;" onclick="GameEngines.rps.selectWeapon('paper')">📄</button><button class="btn btn-secondary" style="font-size: clamp(35px, 10vw, 50px); padding: clamp(15px, 4vw, 25px); flex: 1;" onclick="GameEngines.rps.selectWeapon('scissors')">✂️</button></div></div>`; },
-            selectWeapon: (choice) => { if (gameState.myChoice || sys.isBoardLocked) return; vibrateDevice(30); playSound('click'); gameState.myChoice = choice; updateTurnText(null, "Waiting..."); dataChannel.send({ type: 'game_action', choice: choice }); GameEngines.rps.resolveCombat(); },
+            selectWeapon: (choice) => { 
+                if (gameState.myChoice || sys.isBoardLocked) return; 
+                vibrateDevice(30); playSound('click'); gameState.myChoice = choice; updateTurnText(null, "Waiting..."); 
+                
+                if(sys.playMode === 'p2p') {
+                    dataChannel.send({ type: 'game_action', choice: choice }); 
+                } else if (sys.playMode === 'bot') {
+                    const choices = ['rock', 'paper', 'scissors'];
+                    gameState.oppChoice = choices[Math.floor(Math.random()*3)];
+                    triggerBotEmoji(0.5, '🤔'); // Bot pretends to think
+                    setTimeout(GameEngines.rps.resolveCombat, 1500);
+                }
+                if (sys.playMode === 'p2p') GameEngines.rps.resolveCombat();
+            },
             handleNetworkData: (data) => { if (data.type === 'game_action') { gameState.oppChoice = data.choice; GameEngines.rps.resolveCombat(); } },
             resolveCombat: () => { if (gameState.myChoice && gameState.oppChoice) { sys.isBoardLocked = true; const emojiMap = { rock: '🪨', paper: '📄', scissors: '✂️' }; document.getElementById('rps-result-display').innerText = `${emojiMap[gameState.myChoice]} vs ${emojiMap[gameState.oppChoice]}`; let winner = 'draw'; let mine = gameState.myChoice; let theirs = gameState.oppChoice; if (mine !== theirs) { if ((mine === 'rock' && theirs === 'scissors') || (mine === 'paper' && theirs === 'rock') || (mine === 'scissors' && theirs === 'paper')) winner = sys.myId; else winner = sys.myId === 'p1' ? 'p2' : 'p1'; } finalizeGame(winner); } }
         },
+
+        /* =============== MEMORY (Bot Emoji Integration) =============== */
         memory: {
-            initialize: () => { sys.isBoardLocked = false; if (sys.isHost) { const icons = ['🍎','🌮','🍕','🍩','🍦','🍿','🍔','🍟']; let deck = [...icons, ...icons].sort(() => Math.random() - 0.5); gameState = { deck: deck, flippedIndexes: [], matchedIndexes: [], currentTurn: 'p1' }; dataChannel.send({ type: 'game_init', deck: deck }); GameEngines.memory.renderBoard(); } else { updateTurnText(null, "Shuffling..."); } },
+            initialize: () => { 
+                sys.isBoardLocked = false; 
+                if (sys.isHost || sys.playMode !== 'p2p') { 
+                    const icons = ['🍎','🌮','🍕','🍩','🍦','🍿','🍔','🍟']; let deck = [...icons, ...icons].sort(() => Math.random() - 0.5); 
+                    gameState = { deck: deck, flippedIndexes: [], matchedIndexes: [], currentTurn: 'p1' }; 
+                    if(sys.playMode === 'p2p') dataChannel.send({ type: 'game_init', deck: deck }); 
+                    GameEngines.memory.renderBoard(); 
+                } else { updateTurnText(null, "Shuffling..."); } 
+            },
             handleNetworkData: (data) => { if (data.type === 'game_init') { gameState = { deck: data.deck, flippedIndexes: [], matchedIndexes: [], currentTurn: 'p1' }; GameEngines.memory.renderBoard(); } else if (data.type === 'game_action') { GameEngines.memory.processCardFlip(data.index); } },
-            renderBoard: () => { updateTurnText(gameState.currentTurn); let html = `<div class="memory-grid">`; for (let i = 0; i < 16; i++) { let isMatched = gameState.matchedIndexes.includes(i); let isFlipped = gameState.flippedIndexes.includes(i) || isMatched; let cardClass = `memory-card`; if (isFlipped) cardClass += ` flipped`; if (isMatched) cardClass += ` matched`; let cardContent = isFlipped ? gameState.deck[i] : '❓'; html += `<div class="${cardClass}" onclick="GameEngines.memory.handleCardClick(${i})">${cardContent}</div>`; } document.getElementById('board-container').innerHTML = html + `</div>`; },
-            handleCardClick: (index) => { if (gameState.currentTurn !== sys.myId || gameState.flippedIndexes.length >= 2 || gameState.flippedIndexes.includes(index) || gameState.matchedIndexes.includes(index) || sys.isBoardLocked) return; vibrateDevice(15); playSound('click'); dataChannel.send({ type: 'game_action', index: index }); GameEngines.memory.processCardFlip(index); },
-            processCardFlip: (index) => { gameState.flippedIndexes.push(index); GameEngines.memory.renderBoard(); if (gameState.flippedIndexes.length === 2) { sys.isBoardLocked = true; setTimeout(() => { let card1Index = gameState.flippedIndexes[0]; let card2Index = gameState.flippedIndexes[1]; if (gameState.deck[card1Index] === gameState.deck[card2Index]) { vibrateDevice(50); playSound('win'); gameState.matchedIndexes.push(card1Index, card2Index); sys.scores[gameState.currentTurn]++; updateScoreBoard(); } else { gameState.currentTurn = gameState.currentTurn === 'p1' ? 'p2' : 'p1'; vibrateDevice([20, 20]); } gameState.flippedIndexes = []; sys.isBoardLocked = false; GameEngines.memory.renderBoard(); if (gameState.matchedIndexes.length === 16) { let winner = sys.scores.p1 > sys.scores.p2 ? 'p1' : (sys.scores.p2 > sys.scores.p1 ? 'p2' : 'draw'); finalizeGame(winner); } }, 1000); } }
+            renderBoard: () => { 
+                let turnName = gameState.currentTurn === 'p1' ? sys.myName : (sys.playMode === 'bot' ? 'Computer' : (sys.playMode === 'local' ? 'Player 2' : 'Opponent'));
+                updateTurnText(gameState.currentTurn, turnName + "'s Turn");
+                
+                let html = `<div class="memory-grid">`; 
+                for (let i = 0; i < 16; i++) { 
+                    let isMatched = gameState.matchedIndexes.includes(i); let isFlipped = gameState.flippedIndexes.includes(i) || isMatched; 
+                    let cardClass = `memory-card`; if (isFlipped) cardClass += ` flipped`; if (isMatched) cardClass += ` matched`; 
+                    let cardContent = isFlipped ? gameState.deck[i] : '❓'; 
+                    html += `<div class="${cardClass}" onclick="GameEngines.memory.handleCardClick(${i})">${cardContent}</div>`; 
+                } 
+                document.getElementById('board-container').innerHTML = html + `</div>`; 
+            },
+            handleCardClick: (index, isBot = false) => { 
+                if (gameState.flippedIndexes.length >= 2 || gameState.flippedIndexes.includes(index) || gameState.matchedIndexes.includes(index) || sys.isBoardLocked) return; 
+                if (sys.playMode === 'p2p' && gameState.currentTurn !== sys.myId) return;
+                if (sys.playMode === 'bot' && gameState.currentTurn === 'p2' && !isBot) return;
+
+                vibrateDevice(15); playSound('click'); 
+                if(sys.playMode === 'p2p') dataChannel.send({ type: 'game_action', index: index }); 
+                GameEngines.memory.processCardFlip(index); 
+            },
+            processCardFlip: (index) => { 
+                gameState.flippedIndexes.push(index); GameEngines.memory.renderBoard(); 
+                if (gameState.flippedIndexes.length === 2) { 
+                    sys.isBoardLocked = true; 
+                    setTimeout(() => { 
+                        let card1Index = gameState.flippedIndexes[0]; let card2Index = gameState.flippedIndexes[1]; 
+                        if (gameState.deck[card1Index] === gameState.deck[card2Index]) { 
+                            vibrateDevice(50); playSound('win'); gameState.matchedIndexes.push(card1Index, card2Index); sys.scores[gameState.currentTurn]++; updateScoreBoard(); 
+                            
+                            if(sys.playMode === 'bot' && gameState.currentTurn === 'p2') triggerBotEmoji(0.6, '🔥'); // Bot got a match
+                            
+                            gameState.flippedIndexes = []; sys.isBoardLocked = false; GameEngines.memory.renderBoard(); 
+                            if (gameState.matchedIndexes.length === 16) { 
+                                let winner = sys.scores.p1 > sys.scores.p2 ? 'p1' : (sys.scores.p2 > sys.scores.p1 ? 'p2' : 'draw'); 
+                                finalizeGame(winner); 
+                            } else if (sys.playMode === 'bot' && gameState.currentTurn === 'p2') {
+                                setTimeout(GameEngines.memory.playBot, 1000);
+                            }
+                        } else { 
+                            gameState.currentTurn = gameState.currentTurn === 'p1' ? 'p2' : 'p1'; vibrateDevice([20, 20]); 
+                            gameState.flippedIndexes = []; sys.isBoardLocked = false; GameEngines.memory.renderBoard(); 
+                            if (sys.playMode === 'bot' && gameState.currentTurn === 'p2') {
+                                setTimeout(GameEngines.memory.playBot, 1000);
+                            }
+                        } 
+                    }, 1000); 
+                } 
+            },
+            playBot: () => {
+                let available = [];
+                for(let i=0; i<16; i++) { if(!gameState.matchedIndexes.includes(i) && !gameState.flippedIndexes.includes(i)) available.push(i); }
+                if(available.length >= 2) {
+                    available = available.sort(() => Math.random() - 0.5);
+                    sys.isBoardLocked = false;
+                    GameEngines.memory.handleCardClick(available[0], true); 
+                    triggerBotEmoji(0.2);
+                    setTimeout(() => { sys.isBoardLocked = false; GameEngines.memory.handleCardClick(available[1], true); }, 800);
+                }
+            }
         },
         guess: {
             initialize: () => { sys.isBoardLocked = false; gameState = { targetNumber: 0, myGuess: null, oppGuess: null, roundNumber: 1 }; if (sys.isHost) { gameState.targetNumber = Math.floor(Math.random() * 100) + 1; dataChannel.send({ type: 'game_init', target: gameState.targetNumber }); GameEngines.guess.renderUI(); } else updateTurnText(null, "Syncing..."); },
@@ -603,4 +818,4 @@
 <script>(function(s){s.dataset.zone='10722097',s.src='https://gizokraijaw.net/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 
 </body>
-</html>
+    </html>
