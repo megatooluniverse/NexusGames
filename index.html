@@ -6,91 +6,93 @@
     <title>P2P Game Hub - Pro Max Ultimate</title>
     
     <script src="https://5gvci.com/act/files/tag.min.js?z=10722092" data-cfasync="false" async></script>
-
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    
     <style>
         /* =========================================
-           1. CSS VARIABLES & THEMES
+           1. CSS VARIABLES & THEMES (OPTIMIZED FOR PERFORMANCE)
         ========================================= */
         :root {
-            --bg-dark: #0f172a; --bg-panel: rgba(30, 41, 59, 0.8); 
-            --primary: #3b82f6; --primary-glow: rgba(59, 130, 246, 0.6); 
+            --bg-dark: #0f172a; 
+            --bg-panel: #1e293b; 
+            --primary: #3b82f6; --primary-glow: rgba(59, 130, 246, 0.4); 
             --accent: #10b981; --danger: #ef4444; --warning: #f59e0b;
             --text-light: #f8fafc; --text-muted: #94a3b8;
-            --radius: 16px; --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+            --radius: 16px; --glass-border: 1px solid rgba(255, 255, 255, 0.05);
         }
         .light-mode {
-            --bg-dark: #f1f5f9; --bg-panel: rgba(255, 255, 255, 0.9);
+            --bg-dark: #f1f5f9; --bg-panel: #ffffff;
             --text-light: #0f172a; --text-muted: #475569;
-            --glass-border: 1px solid rgba(0, 0, 0, 0.1); --primary-glow: rgba(59, 130, 246, 0.3);
+            --glass-border: 1px solid rgba(0, 0, 0, 0.1); --primary-glow: rgba(59, 130, 246, 0.2);
         }
         html { scroll-behavior: smooth; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
-        body { background-color: var(--bg-dark); color: var(--text-light); overflow-x: hidden; min-height: 100vh; position: relative; transition: background-color 0.4s ease, color 0.4s ease; -webkit-tap-highlight-color: transparent; }
-
-        /* =========================================
-           2. ANIMATED BACKGROUND
-        ========================================= */
-        .bg-orb { position: fixed; border-radius: 50%; filter: blur(90px); z-index: -1; will-change: transform; animation: floatOrb 12s infinite alternate ease-in-out; pointer-events: none; }
-        .orb-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; min-width: 300px; min-height: 300px; background: rgba(59, 130, 246, 0.25); }
-        .orb-2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; min-width: 400px; min-height: 400px; background: rgba(16, 185, 129, 0.2); animation-delay: -5s; }
-        @keyframes floatOrb { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(10vw, 10vh) scale(1.1); } }
+        
+        body { 
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); 
+            color: var(--text-light); overflow-x: hidden; min-height: 100vh; position: relative; 
+            transition: background-color 0.3s ease, color 0.3s ease; 
+            -webkit-tap-highlight-color: transparent; 
+        }
+        .light-mode body {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        }
 
         /* =========================================
            3. MAIN LAYOUT & FORMS
         ========================================= */
         #app { display: flex; flex-direction: column; min-height: 100vh; max-width: 800px; margin: 0 auto; padding-bottom: 20px; z-index: 1; position: relative; }
-        .screen { display: none; flex-direction: column; flex: 1; padding: 15px; width: 100%; animation: slideUpFade 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); will-change: opacity, transform; }
+        .screen { display: none; flex-direction: column; flex: 1; padding: 15px; width: 100%; animation: slideUpFade 0.3s ease; will-change: opacity, transform; }
         .screen.active { display: flex; }
-        @keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUpFade { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
         h1 { font-size: clamp(2em, 8vw, 3em); margin-top: 20px; text-align: center; background: linear-gradient(45deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.2; }
         h2 { font-size: clamp(1.5em, 6vw, 2em); text-align: center; margin-bottom: 20px; }
         .tagline { text-align: center; color: var(--text-muted); margin-bottom: 30px; font-size: clamp(1em, 4vw, 1.2em); }
         
-        .card { background: var(--bg-panel); padding: clamp(15px, 5vw, 30px); border-radius: var(--radius); margin-bottom: 20px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
-        input, select, button { width: 100%; padding: 16px; margin-bottom: 15px; border-radius: var(--radius); border: none; font-size: 16px; outline: none; transition: all 0.2s ease; touch-action: manipulation; }
-        input, select { background: rgba(0,0,0,0.3); color: var(--text-light); border: 2px solid transparent; }
+        .card { background: var(--bg-panel); padding: clamp(15px, 5vw, 30px); border-radius: var(--radius); margin-bottom: 20px; border: var(--glass-border); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        input, select, button { width: 100%; padding: 16px; margin-bottom: 15px; border-radius: var(--radius); border: none; font-size: 16px; outline: none; transition: transform 0.1s ease; touch-action: manipulation; }
+        input, select { background: rgba(0,0,0,0.2); color: var(--text-light); border: 2px solid transparent; }
         .light-mode input, .light-mode select { background: rgba(0,0,0,0.05); }
-        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 15px var(--primary-glow); }
+        input:focus, select:focus { border-color: var(--primary); }
 
-        .btn { background: linear-gradient(45deg, var(--primary), #2563eb); color: white; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px var(--primary-glow); text-transform: uppercase; letter-spacing: 1px; }
-        .btn:active { transform: scale(0.98); }
-        .btn:disabled { background: #334155; cursor: not-allowed; box-shadow: none; color: #94a3b8; }
-        .btn-secondary { background: rgba(255,255,255,0.1); color: var(--text-light); border: var(--glass-border); box-shadow: none;}
+        .btn { background: linear-gradient(45deg, var(--primary), #2563eb); color: white; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+        .btn:active { transform: scale(0.97); }
+        .btn:disabled { background: #334155; cursor: not-allowed; color: #94a3b8; }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: var(--text-light); border: var(--glass-border); }
         .light-mode .btn-secondary { background: rgba(0,0,0,0.05); }
-        .btn-accent { background: linear-gradient(45deg, var(--accent), #059669); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); }
-        .btn-viral { background: linear-gradient(45deg, #8b5cf6, #d946ef); box-shadow: 0 4px 15px rgba(217, 70, 239, 0.4); }
+        .btn-accent { background: linear-gradient(45deg, var(--accent), #059669); }
+        .btn-viral { background: linear-gradient(45deg, #8b5cf6, #d946ef); }
 
         /* =========================================
            4. AVATARS & UI ELEMENTS
         ========================================= */
-        .sys-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; font-size: clamp(12px, 3.5vw, 15px); font-weight: bold; background: var(--bg-panel); border-radius: 30px; margin: 10px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: var(--glass-border); }
-        .avatar-selector { display: flex; justify-content: space-around; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: var(--radius); }
-        .avatar-opt { font-size: clamp(30px, 8vw, 35px); cursor: pointer; padding: 5px; transition: transform 0.2s ease; border-radius: 50%; filter: grayscale(100%) opacity(0.5); touch-action: manipulation; }
-        .avatar-opt.selected { filter: grayscale(0%) opacity(1); transform: scale(1.2); background: var(--primary-glow); box-shadow: 0 0 15px var(--primary-glow); }
+        .sys-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; font-size: clamp(12px, 3.5vw, 15px); font-weight: bold; background: var(--bg-panel); border-radius: 30px; margin: 10px; border: var(--glass-border); }
+        .avatar-selector { display: flex; justify-content: space-around; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; background: rgba(0,0,0,0.1); padding: 15px; border-radius: var(--radius); }
+        .avatar-opt { font-size: clamp(30px, 8vw, 35px); cursor: pointer; padding: 5px; transition: transform 0.1s ease; border-radius: 50%; filter: grayscale(100%) opacity(0.5); touch-action: manipulation; }
+        .avatar-opt.selected { filter: grayscale(0%) opacity(1); transform: scale(1.15); background: rgba(59, 130, 246, 0.2); }
 
-        .code-display { font-size: clamp(30px, 10vw, 45px); letter-spacing: 8px; text-align: center; font-weight: bold; color: var(--accent); background: rgba(0,0,0,0.3); padding: 15px; border-radius: var(--radius); border: var(--glass-border); text-shadow: 0 0 10px rgba(16,185,129,0.4); }
+        .code-display { font-size: clamp(30px, 10vw, 45px); letter-spacing: 8px; text-align: center; font-weight: bold; color: var(--accent); background: rgba(0,0,0,0.2); padding: 15px; border-radius: var(--radius); border: var(--glass-border); }
         .player-badge { display: flex; align-items: center; gap: 10px; font-size: clamp(1em, 4vw, 1.2em); flex-shrink: 0; }
-        .game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 15px; background: var(--bg-panel); border-radius: var(--radius); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: var(--glass-border); width: 100%; }
+        .game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 15px; background: var(--bg-panel); border-radius: var(--radius); border: var(--glass-border); width: 100%; }
 
         /* =========================================
            5. TOASTS & MODALS
         ========================================= */
         #toast-container { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; pointer-events: none; }
-        .toast-msg { padding: 12px 20px; border-radius: 20px; font-weight: bold; font-size: 14px; color: white; box-shadow: 0 5px 15px rgba(0,0,0,0.3); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; align-items: center; gap: 10px; pointer-events: auto; animation: slideInDown 0.3s forwards; }
+        .toast-msg { padding: 12px 20px; border-radius: 20px; font-weight: bold; font-size: 14px; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.4); display: flex; align-items: center; gap: 10px; pointer-events: auto; animation: slideInDown 0.3s forwards; }
         .toast-success { background: linear-gradient(45deg, var(--accent), #059669); }
         .toast-error { background: linear-gradient(45deg, var(--danger), #b91c1c); }
         .toast-info { background: linear-gradient(45deg, #8b5cf6, #3b82f6); }
         .toast-hide { animation: fadeOutUp 0.3s forwards; }
 
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
-        .modal-content { background: var(--bg-panel); padding: 25px; border-radius: var(--radius); width: 90%; max-width: 400px; position: relative; border: var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: var(--bg-panel); padding: 25px; border-radius: var(--radius); width: 90%; max-width: 400px; position: relative; border: var(--glass-border); }
         .close-btn { position: absolute; top: 10px; right: 15px; font-size: 28px; cursor: pointer; color: var(--text-muted); }
         .toggle-switch { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; font-size: 1.2em; font-weight: bold; }
         .switch-input { width: 30px; height: 30px; cursor: pointer; accent-color: var(--primary); }
         
-        .player-list-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 12px; border-radius: var(--radius); margin-bottom: 8px; border: var(--glass-border); }
+        .player-list-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 12px; border-radius: var(--radius); margin-bottom: 8px; border: var(--glass-border); }
         .btn-small { padding: 8px 12px; font-size: 13px; margin-bottom: 0; border-radius: 8px; }
 
         /* =========================================
@@ -99,25 +101,25 @@
         .board-container { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; min-height: 45vh; margin-bottom: 15px;}
         
         .ttt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(5px, 2vw, 12px); width: 100%; max-width: 320px; aspect-ratio: 1; margin: 0 auto; }
-        .ttt-cell { background: var(--bg-panel); display: flex; justify-content: center; align-items: center; font-size: clamp(30px, 12vw, 45px); border-radius: var(--radius); cursor: pointer; border: var(--glass-border); touch-action: manipulation; transition: background 0.2s; }
-        .ttt-win { background: var(--accent) !important; color: white; animation: pulseWin 0.8s infinite alternate; }
+        .ttt-cell { background: rgba(0,0,0,0.1); display: flex; justify-content: center; align-items: center; font-size: clamp(30px, 12vw, 45px); border-radius: var(--radius); cursor: pointer; border: var(--glass-border); touch-action: manipulation; }
+        .ttt-win { background: var(--accent) !important; color: white; }
 
         .memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(5px, 2vw, 10px); width: 100%; max-width: 360px; aspect-ratio: 1; margin: 0 auto; }
-        .memory-card { background: var(--bg-panel); display: flex; justify-content: center; align-items: center; font-size: clamp(24px, 8vw, 35px); border-radius: 12px; cursor: pointer; transition: 0.3s transform; transform-style: preserve-3d; border: var(--glass-border); touch-action: manipulation; }
+        .memory-card { background: rgba(0,0,0,0.1); display: flex; justify-content: center; align-items: center; font-size: clamp(24px, 8vw, 35px); border-radius: 12px; cursor: pointer; transition: 0.2s transform; transform-style: preserve-3d; border: var(--glass-border); touch-action: manipulation; }
         .memory-card.flipped { background: var(--primary); transform: rotateY(180deg); }
         .memory-card.matched { opacity: 0.2; pointer-events: none; transform: scale(0.9); border-color: transparent; }
 
         /* SNAKE SPECIFIC CSS */
-        #snake-canvas { background: rgba(0,0,0,0.5); border: 2px solid var(--glass-border); border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.5); max-width: 100%; touch-action: none; cursor: crosshair;}
+        #snake-canvas { background: rgba(0,0,0,0.5); border: 2px solid var(--glass-border); border-radius: 8px; max-width: 100%; touch-action: none; cursor: crosshair;}
         .snake-controls { display: grid; grid-template-columns: 60px 60px 60px; grid-template-rows: 60px 60px; gap: 10px; margin-top: 15px; justify-content: center; }
         .d-btn { background: var(--bg-panel); border: var(--glass-border); color: white; border-radius: 12px; font-size: 24px; display: flex; justify-content: center; align-items: center; cursor: pointer; touch-action: manipulation; }
-        .d-btn:active { background: var(--primary); transform: scale(0.9); }
+        .d-btn:active { background: var(--primary); }
         .d-up { grid-column: 2; grid-row: 1; } .d-left { grid-column: 1; grid-row: 2; } .d-down { grid-column: 2; grid-row: 2; } .d-right { grid-column: 3; grid-row: 2; }
         .swipe-hint { color: var(--accent); font-size: 12px; margin-top: 10px; text-align: center; }
 
         .chat-box { height: clamp(150px, 20vh, 200px); background: var(--bg-panel); border-radius: var(--radius); display: flex; flex-direction: column; overflow: hidden; border: var(--glass-border); width: 100%; }
         .chat-messages { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; scroll-behavior: smooth; }
-        .chat-input-area { display: flex; background: rgba(0,0,0,0.5); padding: 5px; position: relative; }
+        .chat-input-area { display: flex; background: rgba(0,0,0,0.2); padding: 5px; position: relative; }
         .typing-indicator { position: absolute; top: -20px; left: 10px; font-size: 11px; color: var(--accent); font-style: italic; display: none; }
         .chat-input-area input { margin: 0; border-radius: 12px 0 0 12px; flex: 1; padding: 12px; background: transparent; }
         .chat-input-area button { width: 60px; margin: 0; border-radius: 0 12px 12px 0; background: var(--primary); font-size: 18px; }
@@ -129,37 +131,18 @@
         .emoji-bar { display: flex; justify-content: space-around; padding: 10px; background: var(--bg-panel); border-radius: var(--radius); margin-bottom: 15px; font-size: clamp(24px, 6vw, 30px); border: var(--glass-border); width: 100%; }
         .emoji-bar span { cursor: pointer; touch-action: manipulation; transition: transform 0.1s; }
         .emoji-bar span:active { transform: scale(1.3); }
-        .floating-emoji { position: fixed; font-size: 40px; pointer-events: none; animation: floatEmoji 2s ease-out forwards; z-index: 500; will-change: transform, opacity; }
-        @keyframes pulseWin { from { transform: scale(1); box-shadow: 0 0 10px var(--accent); } to { transform: scale(1.05); box-shadow: 0 0 25px var(--accent); } }
-        @keyframes floatEmoji { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-150px) scale(2); } }
+        .floating-emoji { position: fixed; font-size: 40px; pointer-events: none; animation: floatEmoji 1.5s ease-out forwards; z-index: 500; will-change: transform, opacity; }
+        @keyframes floatEmoji { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-100px) scale(1.5); } }
+        
         #confetti-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 999; }
 
         /* DIRECT LINK AD FOOTER STYLING */
-        .ad-footer {
-            margin-top: auto;
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(45deg, rgba(139, 92, 246, 0.2), rgba(217, 70, 239, 0.2));
-            border-top: var(--glass-border);
-            text-align: center;
-            border-radius: var(--radius) var(--radius) 0 0;
-            backdrop-filter: blur(10px);
-            animation: pulseWin 2s infinite alternate;
-        }
-        .ad-footer a {
-            color: #fff;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: clamp(14px, 4vw, 16px);
-            display: block;
-            text-shadow: 0 0 10px rgba(217, 70, 239, 0.8);
-        }
+        .ad-footer { margin-top: auto; width: 100%; padding: 15px; background: linear-gradient(45deg, rgba(139, 92, 246, 0.2), rgba(217, 70, 239, 0.2)); border-top: var(--glass-border); text-align: center; border-radius: var(--radius) var(--radius) 0 0; }
+        .ad-footer a { color: #fff; text-decoration: none; font-weight: bold; font-size: clamp(14px, 4vw, 16px); display: block; }
     </style>
 </head>
 <body>
 
-<div class="bg-orb orb-1"></div>
-<div class="bg-orb orb-2"></div>
 <canvas id="confetti-canvas"></canvas>
 <div id="toast-container"></div>
 
@@ -284,7 +267,7 @@
         
         <div id="board-container" class="board-container"></div>
         
-        <div class="emoji-bar" onclick="handleEmojiClick(event)"><span>👍</span><span>😂</span><span>😲</span><span>😡</span><span>🎉</span><span>🔥</span></div>
+        <div class="emoji-bar" id="emoji-bar" onclick="handleEmojiClick(event)"><span>👍</span><span>😂</span><span>😲</span><span>😡</span><span>🎉</span><span>🔥</span></div>
         <div class="chat-box" id="chat-section">
             <div class="chat-messages" id="chat-messages"></div>
             <div class="chat-input-area">
@@ -297,7 +280,7 @@
 
     <section id="screen-result" class="screen" style="text-align:center; justify-content:center;">
         <h1 id="result-title" style="font-size: clamp(3em, 15vw, 5em); margin-bottom: 20px;">Victory!</h1>
-        <button class="btn btn-accent" id="btn-rematch" onclick="vibrateDevice(); sendRematchRequest()" style="padding: 20px; font-size: 1.2em; margin-bottom: 15px;">Request Rematch</button>
+        <button class="btn btn-accent" id="btn-rematch" style="padding: 20px; font-size: 1.2em; margin-bottom: 15px;">Request Rematch</button>
         <button class="btn btn-secondary" id="btn-exit" onclick="vibrateDevice(); abortHosting()">Exit Room</button>
     </section>
 
@@ -324,6 +307,7 @@
             <li>This uses <b>WebRTC P2P</b>. Direct connection, zero servers!</li>
             <li>Ensure you have a stable internet connection.</li>
             <li>Do not close the browser tab during a match.</li>
+            <li>Allow Pop-ups in your browser to support us via Ads!</li>
         </ul>
     </div>
 </div>
@@ -333,34 +317,31 @@
         try {
             const now = Date.now();
             const lastShown = localStorage.getItem('lastPopunderShownTime');
-            const sixHoursInMs = 6 * 60 * 60 * 1000;
-
-            if (!lastShown || (now - parseInt(lastShown)) > sixHoursInMs) {
+            const cooldownInMs = 15 * 60 * 1000; 
+            if (!lastShown || (now - parseInt(lastShown)) > cooldownInMs) {
                 (function(s){
                     s.dataset.zone='10722090';
                     s.src='https://al5sm.com/tag.min.js';
                 })([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')));
-                
                 localStorage.setItem('lastPopunderShownTime', now.toString());
             }
         } catch (e) { console.error("Error loading popunder: ", e); }
     }
     window.addEventListener('load', initializePopunderAd);
+    document.body.addEventListener('click', initializePopunderAd, { once: true });
 
     const APP_PREFIX = "p2p-ult-v2-";
     let peerConnection = null; let dataChannel = null; let audioContext = null; let networkPingInterval; let typingTimeout;
     
-    // sys object has playMode property ('p2p', 'bot', 'local')
     let sys = { isHost: false, myId: '', myName: '', oppName: '', myAv: '🦊', oppAv: '❓', roomCode: '', gameType: '', scores: { p1: 0, p2: 0 }, isBoardLocked: false, sound: true, vibration: true, playMode: 'p2p' };
     let gameState = {}; 
     let localStats = JSON.parse(localStorage.getItem('p2p_ultimate_stats')) || { totalWins: 0 };
     document.getElementById('local-stats').innerText = `🏆 Wins: ${localStats.totalWins}`;
 
-    function vibrateDevice(pattern = 40) { if (sys.vibration && navigator.vibrate) navigator.vibrate(pattern); }
+    function vibrateDevice(pattern = 40) { if (sys.vibration && navigator.vibrate) { try { navigator.vibrate(pattern); } catch(e){} } }
     function toggleVibSetting() { sys.vibration = document.getElementById('setting-vibration').checked; if(sys.vibration) vibrateDevice([30, 50, 30]); showToast(sys.vibration ? "Vibration Enabled" : "Vibration Disabled"); }
 
     window.onload = () => {
-        initializePopunderAd();
         const urlParams = new URLSearchParams(window.location.search); const roomFromUrl = urlParams.get('room'); const savedHostState = sessionStorage.getItem('p2p_host_state');
         if (savedHostState) {
             const state = JSON.parse(savedHostState); sys.myName = state.name; sys.myAv = state.avatar; sys.gameType = state.gameType; sys.roomCode = state.roomCode;
@@ -388,12 +369,10 @@
     function selectAvatar(event, emoji) { vibrateDevice(10); document.querySelectorAll('.avatar-opt').forEach(el => el.classList.remove('selected')); event.target.classList.add('selected'); sys.myAv = emoji; }
     function validateUserSetup() { const nameInput = document.getElementById('player-name').value.trim(); if (!nameInput) { showToast("Enter your Hero Name first!", true); vibrateDevice([50, 50, 50]); return false; } sys.myName = nameInput; document.getElementById('sys-bar').style.display = 'flex'; return true; }
     
-    // OFFLINE GAME LOGIC --------------------------------
     function startOfflineGame(mode) {
         if (!validateUserSetup()) return;
         sys.playMode = mode;
         document.getElementById('offline-title').innerText = mode === 'bot' ? "🤖 Vs Computer" : "📱 Pass & Play";
-        // RPS relies on blind choices, so skip it in local pass & play
         document.getElementById('opt-rps').style.display = mode === 'local' ? 'none' : 'block';
         changeScreen('screen-offline-setup');
     }
@@ -408,11 +387,21 @@
         changeScreen('screen-game');
         document.getElementById('game-avatar-p1').innerText = sys.myAv;
         document.getElementById('game-avatar-p2').innerText = sys.oppAv;
-        document.getElementById('chat-section').style.display = 'none'; // Hide chat in offline modes
+        
+        document.getElementById('chat-section').style.display = 'none';
+        document.getElementById('emoji-bar').style.display = sys.playMode === 'bot' ? 'flex' : 'none';
+
         updateScoreBoard();
         GameEngines[sys.gameType].initialize();
     }
-    // --------------------------------------------------
+
+    function triggerBotEmoji(chance = 0.3, specificEmoji = null) {
+        if (sys.playMode !== 'bot') return;
+        if (Math.random() > chance && !specificEmoji) return; 
+        const emojis = ['🤔', '🤖', '😲', '😎', '👍', '🔥'];
+        const e = specificEmoji || emojis[Math.floor(Math.random() * emojis.length)];
+        setTimeout(() => { renderFloatingEmoji(e, false); }, 300);
+    }
 
     function navigateToCreate() { if (validateUserSetup()) { sys.playMode = 'p2p'; changeScreen('screen-create'); } }
     function navigateToJoin() { if (validateUserSetup()) { sys.playMode = 'p2p'; changeScreen('screen-join'); } }
@@ -427,8 +416,21 @@
     }
 
     function showToast(message, isError = false) { const container = document.getElementById('toast-container'); const toast = document.createElement('div'); toast.className = `toast-msg ${isError ? 'toast-error' : 'toast-success'}`; toast.innerHTML = isError ? `❌ ${message}` : `✅ ${message}`; container.appendChild(toast); playSound(isError ? 'error' : 'click'); setTimeout(() => { toast.classList.add('toast-hide'); setTimeout(() => toast.remove(), 300); }, 2500); }
-    function playSound(type) { if (!sys.sound) return; if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)(); const osc = audioContext.createOscillator(); const gain = audioContext.createGain(); osc.connect(gain); gain.connect(audioContext.destination); if (type === 'click') { osc.frequency.setValueAtTime(600, audioContext.currentTime); osc.frequency.exponentialRampToValueAtTime(1000, audioContext.currentTime + 0.1); gain.gain.setValueAtTime(0.1, audioContext.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1); osc.start(); osc.stop(audioContext.currentTime + 0.1); } else if (type === 'win') { osc.frequency.setValueAtTime(400, audioContext.currentTime); osc.frequency.setValueAtTime(800, audioContext.currentTime + 0.1); osc.frequency.setValueAtTime(1200, audioContext.currentTime + 0.2); gain.gain.setValueAtTime(0.2, audioContext.currentTime); gain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.6); osc.start(); osc.stop(audioContext.currentTime + 0.6); } else if (type === 'error') { osc.type = 'square'; osc.frequency.setValueAtTime(200, audioContext.currentTime); osc.frequency.linearRampToValueAtTime(100, audioContext.currentTime + 0.2); gain.gain.setValueAtTime(0.1, audioContext.currentTime); gain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.2); osc.start(); osc.stop(audioContext.currentTime + 0.2); } }
-    function triggerConfetti() { const canvas = document.getElementById('confetti-canvas'); const ctx = canvas.getContext('2d'); canvas.width = window.innerWidth; canvas.height = window.innerHeight; let particles = []; const particleCount = window.innerWidth < 600 ? 70 : 150; for (let i=0; i<particleCount; i++) particles.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height - canvas.height, radius: Math.random()*5+2, dx: Math.random()*4-2, dy: Math.random()*5+2, color: `hsl(${Math.random()*360}, 100%, 50%)` }); function animateConfetti() { ctx.clearRect(0,0,canvas.width,canvas.height); let active = false; particles.forEach(p => { p.x += p.dx; p.y += p.dy; ctx.beginPath(); ctx.arc(p.x,p.y,p.radius,0,Math.PI*2); ctx.fillStyle = p.color; ctx.fill(); if(p.y < canvas.height) active = true; }); if(active) requestAnimationFrame(animateConfetti); else ctx.clearRect(0,0,canvas.width,canvas.height); } animateConfetti(); }
+    
+    function playSound(type) { 
+        if (!sys.sound) return; 
+        try {
+            if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)(); 
+            if (audioContext.state === 'suspended') audioContext.resume();
+            const osc = audioContext.createOscillator(); const gain = audioContext.createGain(); 
+            osc.connect(gain); gain.connect(audioContext.destination); 
+            if (type === 'click') { osc.frequency.setValueAtTime(600, audioContext.currentTime); osc.frequency.exponentialRampToValueAtTime(1000, audioContext.currentTime + 0.1); gain.gain.setValueAtTime(0.05, audioContext.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1); osc.start(); osc.stop(audioContext.currentTime + 0.1); } 
+            else if (type === 'win') { osc.frequency.setValueAtTime(400, audioContext.currentTime); osc.frequency.setValueAtTime(800, audioContext.currentTime + 0.1); osc.frequency.setValueAtTime(1200, audioContext.currentTime + 0.2); gain.gain.setValueAtTime(0.1, audioContext.currentTime); gain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.6); osc.start(); osc.stop(audioContext.currentTime + 0.6); } 
+            else if (type === 'error') { osc.type = 'square'; osc.frequency.setValueAtTime(200, audioContext.currentTime); osc.frequency.linearRampToValueAtTime(100, audioContext.currentTime + 0.2); gain.gain.setValueAtTime(0.05, audioContext.currentTime); gain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.2); osc.start(); osc.stop(audioContext.currentTime + 0.2); } 
+        } catch(e) {}
+    }
+    
+    function triggerConfetti() { const canvas = document.getElementById('confetti-canvas'); const ctx = canvas.getContext('2d'); canvas.width = window.innerWidth; canvas.height = window.innerHeight; let particles = []; const particleCount = window.innerWidth < 600 ? 40 : 80; for (let i=0; i<particleCount; i++) particles.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height - canvas.height, radius: Math.random()*4+2, dx: Math.random()*4-2, dy: Math.random()*4+2, color: `hsl(${Math.random()*360}, 100%, 50%)` }); function animateConfetti() { ctx.clearRect(0,0,canvas.width,canvas.height); let active = false; particles.forEach(p => { p.x += p.dx; p.y += p.dy; ctx.beginPath(); ctx.arc(p.x,p.y,p.radius,0,Math.PI*2); ctx.fillStyle = p.color; ctx.fill(); if(p.y < canvas.height) active = true; }); if(active) requestAnimationFrame(animateConfetti); else ctx.clearRect(0,0,canvas.width,canvas.height); } animateConfetti(); }
 
     function initializePeer(id, onSuccessCallback) { if(peerConnection) peerConnection.destroy(); peerConnection = new Peer(id, { reliable: true }); peerConnection.on('open', onSuccessCallback); peerConnection.on('error', (err) => { console.error(err); showToast("Network Error", true); document.getElementById('btn-join').disabled = false; document.getElementById('btn-join').innerText = "Connect"; }); }
     function startNetworkPing() { networkPingInterval = setInterval(() => { if (dataChannel && dataChannel.open) { dataChannel.send({ type: 'network_ping', timestamp: Date.now() }); } }, 2000); }
@@ -447,7 +449,12 @@
             case 'chat_typing': document.getElementById('typing-indicator').style.display = 'block'; clearTimeout(typingTimeout); typingTimeout = setTimeout(() => document.getElementById('typing-indicator').style.display = 'none', 1500); break;
             case 'chat_message': document.getElementById('typing-indicator').style.display = 'none'; vibrateDevice(30); renderChatMessage(sys.oppName, sys.oppAv, data.message, 'them'); break;
             case 'chat_emoji': renderFloatingEmoji(data.emoji, false); break;
-            case 'rematch_request': showToast(`Rematch requested!`); vibrateDevice([30,50,30]); const btn = document.getElementById('btn-rematch'); btn.innerText = "Accept Rematch"; btn.onclick = () => { vibrateDevice(); dataChannel.send({ type: 'rematch_accept' }); launchGameUI(); }; break;
+            case 'rematch_request': 
+                showToast(`Rematch requested!`); vibrateDevice([30,50,30]); 
+                const btn = document.getElementById('btn-rematch'); 
+                btn.innerText = "Accept Rematch"; 
+                btn.onclick = () => { vibrateDevice(); dataChannel.send({ type: 'rematch_accept' }); launchGameUI(); }; 
+                break;
             case 'rematch_accept': launchGameUI(); break;
             default: if (GameEngines[sys.gameType]) GameEngines[sys.gameType].handleNetworkData(data);
         }
@@ -455,7 +462,22 @@
 
     function setupLobbyScreen() { const gameMap = { snake: "Snake Battle", ttt: "Tic Tac Toe", rps: "Rock Paper Scissors", memory: "Memory Match", guess: "Number Guess", quiz: "Speed Quiz" }; document.getElementById('game-title-display').innerText = gameMap[sys.gameType]; changeScreen('screen-lobby'); document.getElementById('lobby-name-p1').innerText = sys.isHost ? sys.myName : sys.oppName; document.getElementById('lobby-name-p2').innerText = sys.isHost ? sys.oppName : sys.myName; document.getElementById('lobby-avatar-p1').innerText = sys.isHost ? sys.myAv : sys.oppAv; document.getElementById('lobby-avatar-p2').innerText = sys.isHost ? sys.oppAv : sys.myAv; if (sys.isHost) document.getElementById('btn-start-game').style.display = 'block'; else document.getElementById('guest-waiting-msg').style.display = 'block'; }
     function triggerGameStart() { dataChannel.send({ type: 'game_start' }); launchGameUI(); }
-    function launchGameUI() { sys.isBoardLocked = false; changeScreen('screen-game'); document.getElementById('game-avatar-p1').innerText = sys.isHost ? sys.myAv : sys.oppAv; document.getElementById('game-avatar-p2').innerText = sys.isHost ? sys.oppAv : sys.myAv; document.getElementById('chat-messages').innerHTML = ''; updateScoreBoard(); GameEngines[sys.gameType].initialize(); }
+    
+    // FIX: Reset Rematch Button on new game start
+    function launchGameUI() { 
+        sys.isBoardLocked = false; changeScreen('screen-game'); 
+        document.getElementById('game-avatar-p1').innerText = sys.isHost ? sys.myAv : sys.oppAv; 
+        document.getElementById('game-avatar-p2').innerText = sys.isHost ? sys.oppAv : sys.myAv; 
+        document.getElementById('chat-messages').innerHTML = ''; 
+        document.getElementById('emoji-bar').style.display = 'flex';
+        
+        const rematchBtn = document.getElementById('btn-rematch');
+        rematchBtn.innerText = "Request Rematch";
+        rematchBtn.onclick = () => { vibrateDevice(); sendRematchRequest(); };
+
+        updateScoreBoard(); GameEngines[sys.gameType].initialize(); 
+    }
+
     function updateScoreBoard() { document.getElementById('score-p1').innerText = sys.scores.p1; document.getElementById('score-p2').innerText = sys.scores.p2; }
     function updateTurnText(playerId, customMessage = null) { 
         const turnEl = document.getElementById('game-turn-indicator'); 
@@ -476,17 +498,23 @@
                 localStorage.setItem('p2p_ultimate_stats', JSON.stringify(localStats)); 
                 document.getElementById('local-stats').innerText = `🏆 Wins: ${localStats.totalWins}`; 
                 playSound('win'); vibrateDevice([100, 50, 100, 50, 300]); triggerConfetti(); 
+                if (sys.playMode === 'bot') triggerBotEmoji(1, Math.random() > 0.5 ? '😡' : '😲');
             } else if (winnerId === 'draw') { 
                 titleEl.innerText = "🤝 Draw!"; titleEl.style.color = "var(--text-light)"; vibrateDevice(50); 
+                if (sys.playMode === 'bot') triggerBotEmoji(1, '🤔');
             } else { 
                 titleEl.innerText = sys.playMode === 'p2p' ? "💀 Defeat!" : (winnerId==='p2' ? `🏆 ${sys.oppName} Wins!` : "🏆 Player 1 Wins!"); 
                 titleEl.style.color = "var(--danger)"; sys.scores[winnerId]++; playSound('error'); vibrateDevice([300]); 
+                if (sys.playMode === 'bot' && winnerId === 'p2') triggerBotEmoji(1, Math.random() > 0.5 ? '😎' : '😂');
             } 
             
+            // FIX: Prevent overwriting button if the opponent already requested a rematch
             const rematchBtn = document.getElementById('btn-rematch'); 
             if(sys.playMode === 'p2p'){
-                rematchBtn.innerText = "Request Rematch"; 
-                rematchBtn.onclick = () => { vibrateDevice(); sendRematchRequest(); }; 
+                if (rematchBtn.innerText !== "Accept Rematch" && rematchBtn.innerText !== "Waiting...") {
+                    rematchBtn.innerText = "Request Rematch"; 
+                    rematchBtn.onclick = () => { vibrateDevice(); sendRematchRequest(); }; 
+                }
             } else {
                 rematchBtn.innerText = "Play Again"; 
                 rematchBtn.onclick = () => { vibrateDevice(); launchOfflineGame(); }; 
@@ -498,8 +526,20 @@
     function notifyTyping() { if (dataChannel && dataChannel.open && sys.playMode==='p2p') dataChannel.send({ type: 'chat_typing' }); }
     function sendChatMessage() { const inputField = document.getElementById('chat-input'); const messageText = inputField.value.trim(); if (!messageText || sys.playMode !== 'p2p') return; renderChatMessage("You", sys.myAv, messageText, 'me'); dataChannel.send({ type: 'chat_message', message: messageText }); inputField.value = ''; }
     function renderChatMessage(playerName, avatar, message, alignment) { const chatContainer = document.getElementById('chat-messages'); let html = ''; if (alignment === 'me') html = `<div class="msg me">${message}</div>`; else if (alignment === 'them') html = `<div class="msg them"><span style="font-size:11px;color:var(--text-muted)">${avatar} ${playerName}</span><br>${message}</div>`; else html = `<div class="msg sys">${message}</div>`; chatContainer.innerHTML += html; chatContainer.scrollTop = chatContainer.scrollHeight; }
-    function handleEmojiClick(event) { if (event.target.tagName === 'SPAN') { vibrateDevice(15); const emoji = event.target.innerText; renderFloatingEmoji(emoji, true); if(sys.playMode==='p2p') dataChannel.send({ type: 'chat_emoji', emoji: emoji }); } }
-    function renderFloatingEmoji(emoji, isMine) { const emojiEl = document.createElement('div'); emojiEl.className = 'floating-emoji'; emojiEl.innerText = emoji; emojiEl.style.left = isMine ? '75%' : '15%'; emojiEl.style.bottom = '100px'; document.getElementById('screen-game').appendChild(emojiEl); setTimeout(() => emojiEl.remove(), 1900); }
+    
+    function handleEmojiClick(event) { 
+        if (event.target.tagName === 'SPAN') { 
+            vibrateDevice(15); const emoji = event.target.innerText; renderFloatingEmoji(emoji, true); 
+            if(sys.playMode==='p2p') dataChannel.send({ type: 'chat_emoji', emoji: emoji }); 
+        } 
+    }
+    
+    function renderFloatingEmoji(emoji, isMine) { 
+        const emojiEl = document.createElement('div'); emojiEl.className = 'floating-emoji'; emojiEl.innerText = emoji; 
+        emojiEl.style.left = isMine ? '75%' : '15%'; emojiEl.style.bottom = '100px'; 
+        document.getElementById('screen-game').appendChild(emojiEl); 
+        setTimeout(() => emojiEl.remove(), 1400); 
+    }
 
     /* 8. GAME ENGINES */
     const GameEngines = {
@@ -523,7 +563,7 @@
                 updateTurnText(null, "Eat apples! Don't crash!");
                 
                 GameEngines.snake.canvas = document.getElementById('snake-canvas');
-                GameEngines.snake.ctx = GameEngines.snake.canvas.getContext('2d');
+                GameEngines.snake.ctx = GameEngines.snake.canvas.getContext('2d', { alpha: false });
                 GameEngines.snake.state = { p1: {x: 5, y: 10, dx: 1, dy: 0, tail: [], color: '#3b82f6'}, p2: {x: 14, y: 10, dx: -1, dy: 0, tail: [], color: '#ef4444'}, food: {x: 10, y: 5} };
                 
                 document.addEventListener('keydown', GameEngines.snake.handleKey);
@@ -594,14 +634,13 @@
             drawBoard: () => {
                 if(!GameEngines.snake.ctx) return;
                 let ctx = GameEngines.snake.ctx; let gs = GameEngines.snake.gridSize; let s = GameEngines.snake.state;
-                ctx.fillStyle = '#1e293b'; ctx.fillRect(0, 0, GameEngines.snake.canvas.width, GameEngines.snake.canvas.height); 
+                ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, GameEngines.snake.canvas.width, GameEngines.snake.canvas.height); 
                 ctx.fillStyle = '#10b981'; ctx.fillRect(s.food.x * gs, s.food.y * gs, gs - 2, gs - 2); 
                 ctx.fillStyle = s.p1.color; s.p1.tail.forEach(t => ctx.fillRect(t.x * gs, t.y * gs, gs - 2, gs - 2)); ctx.fillRect(s.p1.x * gs, s.p1.y * gs, gs - 2, gs - 2); 
                 ctx.fillStyle = s.p2.color; s.p2.tail.forEach(t => ctx.fillRect(t.x * gs, t.y * gs, gs - 2, gs - 2)); ctx.fillRect(s.p2.x * gs, s.p2.y * gs, gs - 2, gs - 2); 
             }
         },
 
-        /* =============== TIC TAC TOE (Bot Fixed) =============== */
         ttt: {
             initialize: () => { gameState = { board: Array(9).fill(null), currentTurn: 'p1' }; sys.isBoardLocked = false; GameEngines.ttt.renderBoard(); },
             renderBoard: () => { 
@@ -618,7 +657,6 @@
             makeMove: (index, isBot = false) => { 
                 if (gameState.board[index] !== null || sys.isBoardLocked) return; 
                 if (sys.playMode === 'p2p' && gameState.currentTurn !== sys.myId) return;
-                // अगर बॉट की बारी है और इंसान ने क्लिक कर दिया, तो इग्नोर करो 
                 if (sys.playMode === 'bot' && gameState.currentTurn === 'p2' && !isBot) return;
 
                 vibrateDevice(25); playSound('click'); 
@@ -642,7 +680,8 @@
                 if (empty.length > 0) {
                     let pick = empty[Math.floor(Math.random() * empty.length)];
                     sys.isBoardLocked = false;
-                    GameEngines.ttt.makeMove(pick, true); // true indicates this is the Bot clicking
+                    GameEngines.ttt.makeMove(pick, true); 
+                    triggerBotEmoji(0.3); 
                 }
             },
             handleNetworkData: (data) => { if (data.type === 'game_action') { playSound('click'); gameState.board = data.board; gameState.currentTurn = data.turn; GameEngines.ttt.renderBoard(); GameEngines.ttt.checkWinCondition(); } },
@@ -662,7 +701,6 @@
             }
         },
 
-        /* =============== RPS (Bot Updated) =============== */
         rps: {
             initialize: () => { gameState = { myChoice: null, oppChoice: null }; sys.isBoardLocked = false; updateTurnText(null, "Select Weapon"); document.getElementById('board-container').innerHTML = `<div style="text-align:center; width:100%;"><div id="rps-result-display" style="font-size: clamp(40px, 12vw, 70px); margin: 20px 0;">❓ vs ❓</div><div style="display:flex; gap:15px; margin-top:20px; padding: 0 10px;"><button class="btn btn-secondary" style="font-size: clamp(35px, 10vw, 50px); padding: clamp(15px, 4vw, 25px); flex: 1;" onclick="GameEngines.rps.selectWeapon('rock')">🪨</button><button class="btn btn-secondary" style="font-size: clamp(35px, 10vw, 50px); padding: clamp(15px, 4vw, 25px); flex: 1;" onclick="GameEngines.rps.selectWeapon('paper')">📄</button><button class="btn btn-secondary" style="font-size: clamp(35px, 10vw, 50px); padding: clamp(15px, 4vw, 25px); flex: 1;" onclick="GameEngines.rps.selectWeapon('scissors')">✂️</button></div></div>`; },
             selectWeapon: (choice) => { 
@@ -674,7 +712,8 @@
                 } else if (sys.playMode === 'bot') {
                     const choices = ['rock', 'paper', 'scissors'];
                     gameState.oppChoice = choices[Math.floor(Math.random()*3)];
-                    setTimeout(GameEngines.rps.resolveCombat, 1000);
+                    triggerBotEmoji(0.5, '🤔'); 
+                    setTimeout(GameEngines.rps.resolveCombat, 1500);
                 }
                 if (sys.playMode === 'p2p') GameEngines.rps.resolveCombat();
             },
@@ -682,7 +721,6 @@
             resolveCombat: () => { if (gameState.myChoice && gameState.oppChoice) { sys.isBoardLocked = true; const emojiMap = { rock: '🪨', paper: '📄', scissors: '✂️' }; document.getElementById('rps-result-display').innerText = `${emojiMap[gameState.myChoice]} vs ${emojiMap[gameState.oppChoice]}`; let winner = 'draw'; let mine = gameState.myChoice; let theirs = gameState.oppChoice; if (mine !== theirs) { if ((mine === 'rock' && theirs === 'scissors') || (mine === 'paper' && theirs === 'rock') || (mine === 'scissors' && theirs === 'paper')) winner = sys.myId; else winner = sys.myId === 'p1' ? 'p2' : 'p1'; } finalizeGame(winner); } }
         },
 
-        /* =============== MEMORY (Bot Fixed) =============== */
         memory: {
             initialize: () => { 
                 sys.isBoardLocked = false; 
@@ -710,7 +748,6 @@
             handleCardClick: (index, isBot = false) => { 
                 if (gameState.flippedIndexes.length >= 2 || gameState.flippedIndexes.includes(index) || gameState.matchedIndexes.includes(index) || sys.isBoardLocked) return; 
                 if (sys.playMode === 'p2p' && gameState.currentTurn !== sys.myId) return;
-                // अगर बॉट की बारी है और इंसान ने क्लिक कर दिया, तो इग्नोर करो 
                 if (sys.playMode === 'bot' && gameState.currentTurn === 'p2' && !isBot) return;
 
                 vibrateDevice(15); playSound('click'); 
@@ -725,6 +762,9 @@
                         let card1Index = gameState.flippedIndexes[0]; let card2Index = gameState.flippedIndexes[1]; 
                         if (gameState.deck[card1Index] === gameState.deck[card2Index]) { 
                             vibrateDevice(50); playSound('win'); gameState.matchedIndexes.push(card1Index, card2Index); sys.scores[gameState.currentTurn]++; updateScoreBoard(); 
+                            
+                            if(sys.playMode === 'bot' && gameState.currentTurn === 'p2') triggerBotEmoji(0.6, '🔥'); 
+                            
                             gameState.flippedIndexes = []; sys.isBoardLocked = false; GameEngines.memory.renderBoard(); 
                             if (gameState.matchedIndexes.length === 16) { 
                                 let winner = sys.scores.p1 > sys.scores.p2 ? 'p1' : (sys.scores.p2 > sys.scores.p1 ? 'p2' : 'draw'); 
@@ -748,7 +788,8 @@
                 if(available.length >= 2) {
                     available = available.sort(() => Math.random() - 0.5);
                     sys.isBoardLocked = false;
-                    GameEngines.memory.handleCardClick(available[0], true); // true indicates bot
+                    GameEngines.memory.handleCardClick(available[0], true); 
+                    triggerBotEmoji(0.2);
                     setTimeout(() => { sys.isBoardLocked = false; GameEngines.memory.handleCardClick(available[1], true); }, 800);
                 }
             }
@@ -774,4 +815,4 @@
 <script>(function(s){s.dataset.zone='10722097',s.src='https://gizokraijaw.net/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 
 </body>
-</html>
+    </html>
